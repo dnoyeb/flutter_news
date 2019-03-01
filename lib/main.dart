@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'common/model/MainModel.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'page/WelcomePage.dart';
 
 void main() {
   runApp(MyApp(model: MainModel()));
@@ -64,9 +65,17 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text('Scoped Model'),
+        actions: <Widget>[
+          IconButton(
+            tooltip: 'to result',
+            icon: Icon(Icons.home),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => WelcomePage()));
+            },
+          )
+        ],
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
