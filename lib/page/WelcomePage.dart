@@ -1,8 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 // import '../common/model/MainModel.dart';
 // import 'package:scoped_model/scoped_model.dart';
-import 'LoginPage.dart';
-import 'TabPage.dart';
 import '../common//local/LocalStorage.dart';
 /*
  * 欢迎页
@@ -18,8 +17,8 @@ class WelcomePage extends StatefulWidget {
 class _WelcomePageState extends State<WelcomePage> {
   bool hadInit = false;
   initUser() async {
-    var userInfo = await LocalStorage.get('userInfo');
-    userInfo == null
+    var hasLogin = await LocalStorage.get('hasLogin');
+    hasLogin == null
         ? Navigator.pushReplacementNamed(context, '/login')
         : Navigator.pushReplacementNamed(context, '/tab');
   }
@@ -40,12 +39,14 @@ class _WelcomePageState extends State<WelcomePage> {
   Widget build(BuildContext context) {
     return new Container(
       color: Colors.white,
-      width:double.infinity,
-      height:double.infinity,
+      width: double.infinity,
+      height: double.infinity,
       child: new Center(
         child: Image.asset(
           "assets/images/welcome.jpg",
           fit: BoxFit.fill,
+          width: double.infinity,
+          height: double.infinity,
         ),
       ),
     );

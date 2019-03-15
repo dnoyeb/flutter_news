@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import '../common/local/LocalStorage.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({
     Key key,
   }) : super(key: key);
+  logout() async {
+    await LocalStorage.remove('hasLogin');
+    await LocalStorage.remove('userName');
+    await LocalStorage.remove('password');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,12 +45,12 @@ class MyDrawer extends StatelessWidget {
               child: ListView(
                 children: <Widget>[
                   ListTile(
-                    leading: const Icon(Icons.add),
-                    title: const Text('Add account'),
-                  ),
-                  ListTile(
                     leading: const Icon(Icons.settings),
-                    title: const Text('Manage accounts'),
+                    title: const Text('退出登录'),
+                    onTap: () {
+                      logout();
+                      Navigator.pushReplacementNamed(context, '/login');
+                    },
                   ),
                 ],
               ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import "../common//local//LocalStorage.dart";
+import '../common/utils/CommonUtils.dart';
+import 'package:common_utils/common_utils.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -23,15 +25,19 @@ class _LoginPageState extends State<LoginPage> {
     _focusUserName.addListener(() {
       if (!_focusUserName.hasFocus) {
         setState(() {
-          _userNameValid = RegExp(r'^1\d{10}').hasMatch(_userName);
+          _userNameValid = RegexUtil.isMobileExact(_userName);
         });
       }
     });
     _focusPassword.addListener(() {
       if (!_focusPassword.hasFocus) {
-        setState(() {
-          _passwordValid = RegExp(r'^[a-zA-Z\d_]{8,}$').hasMatch(_password);
-        });
+        if (_password == null || _password.isEmpty) {
+          _passwordValid = false;
+        } else {
+          setState(() {
+            _passwordValid = new RegExp('^(\\w){6,20}\$').hasMatch(_password);
+          });
+        }
       }
     });
     super.initState();
@@ -39,16 +45,18 @@ class _LoginPageState extends State<LoginPage> {
 
   void _userNameChanged(String str) {
     _userName = str;
-    if (RegExp(r'^1\d{10}').hasMatch(str)) {
+    if (RegexUtil.isMobileExact(str)) {
       setState(() {
         _userNameValid = true;
       });
     }
   }
 
-  _passwordChanged(String str) {
+  void _passwordChanged(String str) {
     _password = str;
-    if (RegExp(r'^[a-zA-Z\d_]{8,20}$').hasMatch(str)) {
+    if (_password == null || _password.isEmpty) {
+      _passwordValid = false;
+    } else if (new RegExp('^(\\w){6,20}\$').hasMatch(str)) {
       setState(() {
         _passwordValid = true;
       });
@@ -62,17 +70,27 @@ class _LoginPageState extends State<LoginPage> {
     pwController.value = new TextEditingValue(text: _password ?? "");
   }
 
+  saveUser() async {
+    if (userController.text != '' && pwController.text != '') {
+      await LocalStorage.save('userName', userController.value.toString());
+      await LocalStorage.save('password', pwController.value.toString());
+      await LocalStorage.save('hasLogin', 'yes');
+      Navigator.pushReplacementNamed(context, '/tab');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: new Container(
-        padding: const EdgeInsets.all(30.0),
+        padding: const EdgeInsets.all(100.0),
         child: new Center(
           child: new Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               new TextField(
+                controller: userController,
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.all(10.0),
@@ -88,6 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                 autofocus: false,
               ),
               new TextField(
+                controller: pwController,
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.all(10.0),
@@ -124,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
                       onPressed: () {
-                        
+                        saveUser();
                       },
                       color: Colors.blue,
                     ),
@@ -144,7 +163,9 @@ class _LoginPageState extends State<LoginPage> {
                           )
                         ],
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        CommonUtils.showAlertDialog(context, '~~', '暂未开发');
+                      },
                       color: Colors.blue,
                     ),
                   ],
