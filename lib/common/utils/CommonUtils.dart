@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class CommonUtils {
-  static Future<Null> showLoadingDialog(BuildContext context) {
+  static showLoadingDialog(BuildContext context) {
     return showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -41,8 +41,7 @@ class CommonUtils {
         });
   }
 
-  static Future<Null> showAlertDialog(
-      BuildContext context, String title, String text) {
+  static showAlertDialog(BuildContext context, String title, String text) {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!

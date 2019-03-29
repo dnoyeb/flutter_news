@@ -88,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
             image: new AssetImage("assets/images/welcome.jpg"),
             fit: BoxFit.fill,
             colorFilter: ColorFilter.mode(
-                Colors.grey[400].withOpacity(0.5), BlendMode.hardLight),
+                Colors.grey[400].withOpacity(0.3), BlendMode.hardLight),
           ),
         ),
         width: double.infinity,
