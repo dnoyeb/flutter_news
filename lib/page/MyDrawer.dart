@@ -35,7 +35,7 @@ class MyDrawer extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "Wendux",
+                    "kAng",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   )
                 ],

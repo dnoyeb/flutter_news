@@ -93,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
         width: double.infinity,
         height: double.infinity,
-        padding: const EdgeInsets.all(100.0),
+        padding: const EdgeInsets.all(30.0),
         child: new Center(
           child: new Column(
             mainAxisAlignment: MainAxisAlignment.center,
