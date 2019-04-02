@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 // import '../common/model/MainModel.dart';
 // import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
-import '../page/MyDrawer.dart';
+// import '../page/MyDrawer.dart';
 // import '../common/config/Config.dart';
 class HomePage extends StatefulWidget {
   @override
@@ -63,14 +63,6 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        //导航栏
-        title: Text("Home"),
-        actions: <Widget>[
-          //导航栏右侧菜单
-          IconButton(icon: Icon(Icons.share), onPressed: () {}),
-        ],
-      ),
       body: EasyRefresh(
         key: _easyRefreshKey,
         behavior: ScrollOverBehavior(),
@@ -95,6 +87,7 @@ class HomePageState extends State<HomePage> {
               return new Container(
                   height: 70.0,
                   child: Card(
+                    color: index % 2 == 0 ? Colors.brown : Colors.deepOrange,
                     child: new Center(
                       child: new Text(
                         dataList[index],

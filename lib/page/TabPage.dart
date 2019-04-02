@@ -1,4 +1,4 @@
-import 'dart:io';
+// import 'dart:io';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -10,6 +10,8 @@ import '../page/InfoPage.dart';
 // import 'page/WelcomePage.dart';
 import '../page/MyDrawer.dart';
 import 'package:image_picker/image_picker.dart';
+// import '../common/model/MainModel.dart';
+// import 'package:scoped_model/scoped_model.dart';
 
 class TabPage extends StatefulWidget {
   @override
@@ -19,15 +21,6 @@ class TabPage extends StatefulWidget {
 class _TabPageState extends State<TabPage> {
   int _selectedIndex = 0;
   List<Widget> pages = List<Widget>();
-  File _image;
-
-  Future getImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.camera);
-
-    setState(() {
-      _image = image;
-    });
-  }
 
   @override
   void initState() {
@@ -38,14 +31,16 @@ class _TabPageState extends State<TabPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   //导航栏
-      //   title: Text("首页"),
-      //   actions: <Widget>[
-      //     //导航栏右侧菜单
-      //     IconButton(icon: Icon(Icons.share), onPressed: () {}),
-      //   ],
-      // ),
+      appBar: _selectedIndex == 0
+          ? AppBar(
+              //导航栏
+              title: Text("首页"),
+              actions: <Widget>[
+                //导航栏右侧菜单
+                IconButton(icon: Icon(Icons.share), onPressed: () {}),
+              ],
+            )
+          : null,
       drawer: new MyDrawer(), //抽屉
       body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -66,9 +61,39 @@ class _TabPageState extends State<TabPage> {
             // onPressed: model.increment,
             // tooltip: 'add',
             // child: Icon(Icons.add),
-            onPressed: getImage,
+            onPressed: () {
+              showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min, // 设置最小的弹出
+                      children: <Widget>[
+                        new ListTile(
+                          leading: new Icon(Icons.photo_camera),
+                          title: new Text("相机"),
+                          onTap: () async {
+                            Navigator.pop(context);
+                            var image = await ImagePicker.pickImage(
+                                source: ImageSource.camera);
+                            model.setImage(image);
+                          },
+                        ),
+                        new ListTile(
+                          leading: new Icon(Icons.photo_library),
+                          title: new Text("图库"),
+                          onTap: () async {
+                            Navigator.pop(context);
+                            var image = await ImagePicker.pickImage(
+                                source: ImageSource.gallery);
+                            model.setImage(image);
+                          },
+                        ),
+                      ],
+                    );
+                  });
+            },
             tooltip: '选择照片',
-            backgroundColor:Colors.deepPurple, 
+            backgroundColor: Colors.deepPurple,
             child: Icon(
               Icons.camera,
             ),
