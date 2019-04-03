@@ -35,10 +35,6 @@ class _TabPageState extends State<TabPage> {
           ? AppBar(
               //导航栏
               title: Text("首页"),
-              actions: <Widget>[
-                //导航栏右侧菜单
-                IconButton(icon: Icon(Icons.share), onPressed: () {}),
-              ],
             )
           : null,
       drawer: new MyDrawer(), //抽屉
