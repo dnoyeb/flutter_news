@@ -95,21 +95,25 @@ class PageOne extends StatefulWidget {
 
 class _PageOneState extends State<PageOne> {
   void showPhoto(BuildContext context, f, source) {
-    Navigator.push(context,
-        MaterialPageRoute<void>(builder: (BuildContext context) {
-      return Scaffold(
-        appBar: AppBar(title: Text('图片')),
-        body: SizedBox.expand(
-          child: Hero(
-            tag: 1,
-            child: new Photo(
-              url: f,
-              source: source,
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) {
+          return Scaffold(
+            appBar: AppBar(title: Text('图片')),
+            body: SizedBox.expand(
+              child: Hero(
+                tag: 1,
+                child: new Photo(
+                  url: f,
+                  source: source,
+                ),
+              ),
             ),
-          ),
-        ),
-      );
-    }));
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -122,7 +126,7 @@ class _PageOneState extends State<PageOne> {
             children: <Widget>[
               new GestureDetector(
                 onTap: () {
-                  showPhoto(context, 'assets/images/timg3.jpg',1);
+                  showPhoto(context, 'assets/images/timg3.jpg', 1);
                 },
                 child: Hero(
                   tag: 1,
@@ -137,7 +141,7 @@ class _PageOneState extends State<PageOne> {
                   ? Text('去拍照')
                   : new GestureDetector(
                       onTap: () {
-                        showPhoto(context, model.imageData,2);
+                        showPhoto(context, model.imageData, 2);
                       },
                       child: Hero(
                         tag: 2,

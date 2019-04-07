@@ -74,23 +74,16 @@ class _MyPageState extends State<MyPage> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final double width = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Container(
-        decoration: new BoxDecoration(
-          border: new Border.all(color: Colors.red, width: 0.5),
-        ),
-        child: Transform(
-          transform: Matrix4.translationValues(50.0, 0.0, 0.0),
-          child: ClipPath(
-            clipper: BottomClipper(),
-            child: SizedOverflowBox(
-              size: Size(width * 2, 200.0),
-              child: Container(
-                color: Colors.deepPurpleAccent,
-                height: 200.0,
-              ),
-            ),
+        // decoration: new BoxDecoration(
+        //   border: new Border.all(color: Colors.red, width: 0.5),
+        // ),
+        child: ClipPath(
+          clipper: BottomClipper(),
+          child: Container(
+            color: Colors.deepPurpleAccent,
+            height: 200.0,
           ),
         ),
       ),
@@ -99,16 +92,16 @@ class _MyPageState extends State<MyPage> with SingleTickerProviderStateMixin {
 }
 
 class BottomClipper extends CustomClipper<Path> {
+  // BottomClipper(this.item);
   @override
   Path getClip(Size size) {
     var path = Path();
     double w = size.width;
     double h = size.height;
-    path.moveTo(-w, 0);
-    path.lineTo(-w, h - 80);
-
-    for (int i = -2; i < 2; i++) {
-      var cp = Offset(i * w / 2 + w / 4, h + 40 * (i % 2 == 0 ? -1 : 1) - 40);
+    path.lineTo(0, h - 40);
+    for (int i = 0; i < 2; i++) {
+      var cp =
+          Offset(i * w / 2 + w / 4, h + 40 * (i % 2 == 0 ? -1 : 1) - 40);
       var ep = Offset((i + 1) * w / 2, h - 40);
       path.quadraticBezierTo(cp.dx, cp.dy, ep.dx, ep.dy);
     }

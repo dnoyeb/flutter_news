@@ -31,10 +31,12 @@ class _TabPageState extends State<TabPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _selectedIndex == 0
+      appBar: _selectedIndex == 2
           ? AppBar(
               //导航栏
-              title: Text("首页"),
+              title: Text("My"),
+              elevation  : 0.0,
+              backgroundColor: Colors.deepPurpleAccent,
             )
           : null,
       drawer: new MyDrawer(), //抽屉
