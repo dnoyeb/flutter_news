@@ -35,10 +35,10 @@ class _DetailPageState extends State<DetailPage> {
               overflow: Overflow.visible,
               children: <Widget>[
                 Container(
-                  child: Image.asset(
+                  child: Image.network(
                     widget.imgUrl,
                     fit: BoxFit.fill,
-                    height:220.0,
+                    height: 220.0,
                     width: double.infinity,
                   ),
                 ),

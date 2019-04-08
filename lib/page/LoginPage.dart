@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import "../common//local//LocalStorage.dart";
@@ -75,7 +77,9 @@ class _LoginPageState extends State<LoginPage> {
       await LocalStorage.save('userName', userController.value.toString());
       await LocalStorage.save('password', pwController.value.toString());
       await LocalStorage.save('hasLogin', 'yes');
-      Navigator.pushReplacementNamed(context, '/tab');
+      new Timer(Duration(seconds: 2), () {
+        Navigator.pushReplacementNamed(context, '/tab');
+      });
     }
   }
 
@@ -153,6 +157,7 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
                       onPressed: () {
+                        CommonUtils.showLoadingDialog(context, '正在登陆');
                         saveUser();
                       },
                       color: Colors.blue,

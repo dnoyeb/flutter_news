@@ -21,8 +21,9 @@ class MyDrawer extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(top: 38.0),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 28.0),
+              color: Colors.blueAccent,
               child: Row(
                 children: <Widget>[
                   Padding(

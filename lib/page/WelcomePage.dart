@@ -96,7 +96,7 @@ class _WelcomePageState extends State<WelcomePage> {
       new Slide(
         title: "FUTURE",
         description: "say hi",
-        backgroundColor: Colors.yellow,
+        backgroundColor: Colors.orangeAccent,
       ),
     );
   }

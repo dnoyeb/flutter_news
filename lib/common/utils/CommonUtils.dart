@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class CommonUtils {
-  static showLoadingDialog(BuildContext context) {
+  static showLoadingDialog(BuildContext context, String msg) {
     return showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -28,9 +28,9 @@ class CommonUtils {
                             child: SpinKitCubeGrid(color: Colors.white)),
                         new Container(height: 10.0),
                         new Container(
-                            child: new Text('正在加载',
+                            child: new Text(msg ?? '正在加载',
                                 style: TextStyle(
-                                  color: Colors.black,
+                                  color: Colors.white,
                                   fontSize: 12,
                                 ))),
                       ],
