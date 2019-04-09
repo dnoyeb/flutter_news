@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../common/model/MainModel.dart';
 import 'package:scoped_model/scoped_model.dart';
-import '../widget/photoScale.dart';
+import '../widget/PhotoScale.dart';
 import 'package:video_player/video_player.dart';
+import 'package:image_picker/image_picker.dart';
 
 class InfoPage extends StatefulWidget {
   _InfoPageState createState() => _InfoPageState();
@@ -95,7 +96,7 @@ class PageOne extends StatefulWidget {
 }
 
 class _PageOneState extends State<PageOne> {
-  void showPhoto(BuildContext context, f, source) {
+  void showPhoto(BuildContext context, f, source, tag) {
     Navigator.push(
       context,
       MaterialPageRoute<void>(
@@ -104,7 +105,7 @@ class _PageOneState extends State<PageOne> {
             appBar: AppBar(title: Text('图片')),
             body: SizedBox.expand(
               child: Hero(
-                tag: -1,
+                tag: tag,
                 child: new Photo(
                   url: f,
                   source: source,
@@ -121,39 +122,87 @@ class _PageOneState extends State<PageOne> {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
       builder: (context, child, model) {
-        return Container(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              new GestureDetector(
-                onTap: () {
-                  showPhoto(context, 'assets/images/timg3.jpg', 1);
-                },
-                child: Hero(
-                  tag: -2,
-                  child: Image.asset(
-                    'assets/images/timg3.jpg',
-                    width: 260.0,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-              model.imageData == null
-                  ? Text('右侧按钮-->')
-                  : new GestureDetector(
+        return Scaffold(
+          body: Container(
+            padding: EdgeInsets.all(10.0),
+            child: ListView.builder(
+              itemCount: 2,
+              itemBuilder: (BuildContext context, int index) {
+                if (index == 0) {
+                  return new GestureDetector(
                       onTap: () {
-                        showPhoto(context, model.imageData, 2);
+                        showPhoto(context, 'assets/images/timg3.jpg', 1, 'aaa');
                       },
-                      child: Hero(
-                        tag: 2,
-                        child: Image.file(
-                          model.imageData,
-                          width: 260.0,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 10.0),
+                        child: Hero(
+                          tag: 'aaa',
+                          child: Image.asset(
+                            'assets/images/timg3.jpg',
+                            width: 260.0,
+                            fit: BoxFit.contain,
+                          ),
                         ),
-                      ),
-                    ),
-            ],
+                      ));
+                } else {
+                  return model.imageData == null
+                      ? Text('')
+                      : new GestureDetector(
+                          onTap: () {
+                            showPhoto(context, model.imageData, 2, 'bbb');
+                          },
+                          child: Hero(
+                            tag: 'bbb',
+                            child: Image.file(
+                              model.imageData,
+                              width: 260.0,
+                            ),
+                          ),
+                        );
+                }
+              },
+            ),
           ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min, // 设置最小的弹出
+                      children: <Widget>[
+                        new ListTile(
+                          leading: new Icon(Icons.photo_camera),
+                          title: new Text("相机"),
+                          onTap: () async {
+                            Navigator.pop(context);
+                            var image = await ImagePicker.pickImage(
+                                source: ImageSource.camera);
+                            model.setImage(image);
+                          },
+                        ),
+                        new ListTile(
+                          leading: new Icon(Icons.photo_library),
+                          title: new Text("图库"),
+                          onTap: () async {
+                            Navigator.pop(context);
+                            var image = await ImagePicker.pickImage(
+                                source: ImageSource.gallery);
+                            model.setImage(image);
+                          },
+                        ),
+                      ],
+                    );
+                  });
+            },
+            tooltip: '选择照片',
+            backgroundColor: Colors.deepPurple,
+            child: Icon(
+              Icons.camera,
+            ),
+          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
         );
       },
     );

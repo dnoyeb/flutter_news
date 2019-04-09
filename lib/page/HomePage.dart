@@ -3,13 +3,12 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:syk_flutter/common/net/http.dart';
-import 'package:syk_flutter/common/utils/CommonUtils.dart';
 import '../common/model/MainModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:syk_flutter/page/Detail.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
-import '../page//webviewPage.dart';
+import './WebviewPage.dart';
 
 // import '../page/MyDrawer.dart';
 // import '../common/config/Config.dart';

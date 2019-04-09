@@ -1,17 +1,8 @@
-// import 'dart:io';
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import '../common/model/MainModel.dart';
-import 'package:scoped_model/scoped_model.dart';
 import '../page/MyPage.dart';
 import '../page/HomePage.dart';
 import '../page/InfoPage.dart';
-// import 'page/WelcomePage.dart';
 import '../page/MyDrawer.dart';
-import 'package:image_picker/image_picker.dart';
-// import '../common/model/MainModel.dart';
-// import 'package:scoped_model/scoped_model.dart';
 
 class TabPage extends StatefulWidget {
   TabPage({Key key}) : super(key: key);
@@ -20,7 +11,6 @@ class TabPage extends StatefulWidget {
 }
 
 class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
-  int _selectedIndex = 0;
   // List<Widget> pages = List<Widget>();
   TabController _tabController;
   @override
@@ -76,51 +66,6 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
       //   fixedColor: Colors.blue,
       //   onTap: _onItemTapped,
       // ),
-      floatingActionButton: ScopedModelDescendant<MainModel>(
-        builder: (context, child, model) {
-          return FloatingActionButton(
-            // onPressed: model.increment,
-            // tooltip: 'add',
-            // child: Icon(Icons.add),
-            onPressed: () {
-              showModalBottomSheet(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min, // 设置最小的弹出
-                      children: <Widget>[
-                        new ListTile(
-                          leading: new Icon(Icons.photo_camera),
-                          title: new Text("相机"),
-                          onTap: () async {
-                            Navigator.pop(context);
-                            var image = await ImagePicker.pickImage(
-                                source: ImageSource.camera);
-                            model.setImage(image);
-                          },
-                        ),
-                        new ListTile(
-                          leading: new Icon(Icons.photo_library),
-                          title: new Text("图库"),
-                          onTap: () async {
-                            Navigator.pop(context);
-                            var image = await ImagePicker.pickImage(
-                                source: ImageSource.gallery);
-                            model.setImage(image);
-                          },
-                        ),
-                      ],
-                    );
-                  });
-            },
-            tooltip: '选择照片',
-            backgroundColor: Colors.deepPurple,
-            child: Icon(
-              Icons.camera,
-            ),
-          );
-        },
-      ),
     );
   }
 
