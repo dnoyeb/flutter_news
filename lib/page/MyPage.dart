@@ -22,7 +22,7 @@ class _MyPageState extends State<MyPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Animate'),
+        title: Text(choose),
         backgroundColor: Colors.blueAccent,
         actions: <Widget>[
           PopupMenuButton<String>(
