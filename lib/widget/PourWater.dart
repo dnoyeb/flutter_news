@@ -12,7 +12,17 @@ class PourWaterPage extends StatefulWidget {
   _PourWaterPageState createState() => new _PourWaterPageState();
 }
 
-class _PourWaterPageState extends State<PourWaterPage> {
+class _PourWaterPageState extends State<PourWaterPage>
+    with TickerProviderStateMixin {
+  Animation<double> tween;
+  Animation<double> tweenLight;
+  AnimationController controller;
+  AnimationController controllerLight;
+  final double paddingTop = 50.0;
+  final double paddingBottom = 50.0;
+  final int markCount = 12;
+  final double lineWeight = 2.0;
+  final double amplitude = 50.0;
   @override
   void initState() {
     gyroscopeEvents.listen((GyroscopeEvent event) {
@@ -20,12 +30,34 @@ class _PourWaterPageState extends State<PourWaterPage> {
       // print(event);
       // [GyroscopeEvent (x: -0.0564117431640625, y: -0.1850433349609375, z: 0.072967529296875)]
     });
+    //     /*创建动画控制类对象*/
+    controller = new AnimationController(
+        duration: const Duration(seconds: 2), vsync: this);
+    controllerLight = new AnimationController(
+        duration: const Duration(seconds: 3), vsync: this);
+
+    /*创建补间对象*/
+    tween = new Tween(begin: 0.0, end: 1.0).animate(controller) //返回Animation对象
+      ..addListener(() {
+        //添加监听
+        setState(() {});
+      });
+    controller.repeat(); //重复动画
+
+    tweenLight =
+        new Tween(begin: 0.0, end: 1.0).animate(controllerLight) //返回Animation对象
+          ..addListener(() {
+            //添加监听
+            setState(() {});
+          });
+    controllerLight.repeat();
     super.initState();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    controller.dispose();
+    controllerLight.dispose();
     super.dispose();
   }
 
@@ -40,23 +72,41 @@ class _PourWaterPageState extends State<PourWaterPage> {
               width: double.infinity,
               height: double.infinity,
               child: SliderMarks(
-                paddingTop: 50.0,
-                paddingBottom: 50.0,
-                markCount: 12,
-                lineWeight: 2.0,
+                paddingTop: paddingTop,
+                paddingBottom: paddingBottom,
+                markCount: markCount,
+                lineWeight: lineWeight,
                 lineColor: Theme.of(context).primaryColor,
                 bgColor: Colors.white,
               ),
             ),
             SlideWave(
+              offsetX: tweenLight.value,
+              amplitude: amplitude,
               child: Container(
                 width: double.infinity,
                 height: double.infinity,
                 child: SliderMarks(
-                  paddingTop: 50.0,
-                  paddingBottom: 50.0,
-                  markCount: 12,
-                  lineWeight: 2.0,
+                  paddingTop: paddingTop,
+                  paddingBottom: paddingBottom,
+                  markCount: markCount,
+                  lineWeight: lineWeight,
+                  lineColor: Colors.white,
+                  bgColor: Theme.of(context).primaryColorLight,
+                ),
+              ),
+            ),
+            SlideWave(
+              offsetX: tween.value,
+              amplitude: amplitude,
+              child: Container(
+                width: double.infinity,
+                height: double.infinity,
+                child: SliderMarks(
+                  paddingTop: paddingTop,
+                  paddingBottom: paddingBottom,
+                  markCount: markCount,
+                  lineWeight: lineWeight,
                   lineColor: Colors.white,
                   bgColor: Theme.of(context).primaryColor,
                 ),
@@ -71,38 +121,47 @@ class _PourWaterPageState extends State<PourWaterPage> {
 
 class SlideWave extends StatelessWidget {
   Widget child;
-  SlideWave({this.child});
+  double offsetX;
+  double amplitude;
+  SlideWave({this.child, this.offsetX, this.amplitude});
 
   @override
   Widget build(BuildContext context) {
     return ClipPath(
-      clipper: SliderClipper(),
+      clipper: SliderClipper(offsetX: offsetX, amplitude: amplitude),
       child: child,
     );
   }
 }
 
 class SliderClipper extends CustomClipper<Path> {
+  double offsetX;
+  double amplitude; //幅度
+  SliderClipper({this.offsetX, this.amplitude});
   @override
   Path getClip(Size size) {
     Path path = Path();
     double w = size.width;
     double h = size.height;
-    path.moveTo(0, h / 2);
-    for (int i = 0; i < 2; i++) {
-      var cp = Offset(i * w / 2 + w / 4, h/2 + 40 * (i % 2 == 0 ? -1 : 1) - 40);
-      var ep = Offset((i + 1) * w / 2, h/2 - 40);
+    double dm = w / 3;
+    double ow = offsetX * dm * 2;
+
+    path.moveTo(-2 * dm + ow, h / 2);
+    for (int i = -2; i < 3; i++) {
+      var cp = Offset(
+          i * dm + dm / 2 + ow, h / 2 + amplitude * (i % 2 == 0 ? -1 : 1));
+      var ep = Offset((i + 1) * dm + ow, h / 2);
       path.quadraticBezierTo(cp.dx, cp.dy, ep.dx, ep.dy);
     }
-    path.lineTo(w, h / 2);
-    path.lineTo(w, h);
-    path.lineTo(0, h);
+    path.lineTo(w + ow, h / 2);
+    path.lineTo(w + ow, h);
+    path.lineTo(-2 * dm + ow, h);
 
     return path;
   }
 
   @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+  bool shouldReclip(CustomClipper<Path> oldClipper) => true;
 }
 
 class SliderMarks extends StatelessWidget {
@@ -168,9 +227,9 @@ class SliderMarksPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     canvas.drawRect(
         Rect.fromLTWH(
-          -300.0,
           0.0,
-          size.width*2,
+          0.0,
+          size.width,
           size.height,
         ),
         bgPaint);
