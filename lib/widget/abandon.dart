@@ -300,3 +300,150 @@
 //   @override
 //   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 // }
+
+
+
+// RefreshIndicator(
+//   key: _refreshIndicatorKey,
+//   onRefresh: _refresh,
+//   child: CustomScrollView(
+//     slivers: <Widget>[
+//       SliverPersistentHeader(
+//         pinned: false,
+//         floating: false,
+//         delegate: SliverAppBarDelegate(
+//           minHeight: 60.0,
+//           maxHeight: 180.0,
+//           child: Container(
+//               child: Stack(
+//             children: <Widget>[
+//               Container(
+//                 height: 180.0,
+//                 width: double.infinity,
+//                 child: Stack(
+//                   children: <Widget>[
+//                     Image.asset(
+//                       model.imageUrl ?? 'assets/images/slide1.png',
+//                       fit: BoxFit.fill,
+//                       width: double.infinity,
+//                       height: double.infinity,
+//                     ),
+//                     BackdropFilter(
+//                       filter:
+//                           new ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+//                       child: new Container(
+//                         color: Colors.white.withOpacity(0.1),
+//                         width: double.infinity,
+//                         height: double.infinity,
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//               Container(
+//                 padding: EdgeInsets.symmetric(vertical: 20.0),
+//                 child: Swiper(
+//                   itemBuilder: (BuildContext context, int index) {
+//                     return Hero(
+//                       tag: index,
+//                       child: ClipRRect(
+//                         borderRadius: BorderRadius.circular(10),
+//                         child: Image.asset(
+//                           imgUrlList[index],
+//                           fit: BoxFit.fill,
+//                         ),
+//                       ),
+//                     );
+//                   },
+//                   onIndexChanged: (index) {
+//                     model.setSlideImage(imgUrlList[index]);
+//                   },
+//                   itemCount: 4,
+//                   viewportFraction: 0.8,
+//                   scale: 0.9,
+//                   onTap: (index) {
+//                     // return new MaterialApp(
+//                     //   routes: {
+//                     //     "/": (_) => new WebviewScaffold(
+//                     //           url: "https://www.baidu.com",
+//                     //           appBar: new AppBar(
+//                     //             title: new Text(imgUrlList[index]),
+//                     //           ),
+//                     //         )
+//                     //   },
+//                     // );
+//                     goDetail(context, imgUrlList[index], index);
+//                   },
+//                 ),
+//               )
+//             ],
+//           )),
+//         ),
+//       ),
+//       SliverList(
+//         delegate: SliverChildBuilderDelegate(
+//           (BuildContext context, int index) {
+//             return _renderItem(index);
+//           },
+//           childCount: dataList.length,
+//         ),
+//       )
+//     ],
+//   ),
+// );
+
+
+
+// @override
+  // Widget build(BuildContext context) {
+  //   return Container(
+  //     margin: EdgeInsets.all(15.0),
+  //     height: 150.0,
+  //     decoration: BoxDecoration(
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.blueGrey,
+  //           offset: Offset(5.0, 5.0),
+  //           blurRadius: 10.0,
+  //           spreadRadius: 2.0,
+  //         ),
+  //       ],
+  //     ),
+  //     child: Stack(
+  //       children: <Widget>[
+  //         GestureDetector(
+  //           child: Hero(
+  //             tag: index,
+  //             child: Image.network(
+  //               dataList[index],
+  //               fit: BoxFit.fill,
+  //               width: double.infinity,
+  //               height: double.infinity,
+  //             ),
+  //           ),
+  //           onTap: () {
+  //             goDetail(context, dataList[index], index);
+  //           },
+  //         ),
+  //         Positioned(
+  //           bottom: 0,
+  //           left: 0,
+  //           right: 0,
+  //           child: Container(
+  //             height: 40.0,
+  //             color: Color.fromRGBO(255, 255, 255, 0.6),
+  //             alignment: Alignment.centerLeft,
+  //             padding: EdgeInsets.only(left: 10.0),
+  //             child: Text(
+  //               '第${index}条数据',
+  //               style: TextStyle(
+  //                 inherit: false,
+  //                 color: Colors.black,
+  //               ),
+  //             ),
+  //           ),
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }

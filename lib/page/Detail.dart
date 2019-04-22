@@ -26,10 +26,10 @@ class _DetailPageState extends State<DetailPage> {
         //   ),
         // ),
         SliverPersistentHeader(
-          pinned: false,
-          floating: false,
+          pinned: true,
+          floating: true,
           delegate: SliverAppBarDelegate(
-            minHeight: 60.0,
+            minHeight: 80.0,
             maxHeight: 220.0,
             child: Stack(
               overflow: Overflow.visible,

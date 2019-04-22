@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:syk_flutter/common/net/http.dart';
+import 'package:syk_flutter/widget/HomeItem.dart';
 import '../common/model/MainModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
@@ -81,79 +82,6 @@ class _HomePageState extends State<HomePage>
     });
   }
 
-  _renderItem(int index) {
-    return Container(
-      margin: EdgeInsets.all(15.0),
-      height: 150.0,
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blueGrey,
-            offset: Offset(5.0, 5.0),
-            blurRadius: 10.0,
-            spreadRadius: 2.0,
-          ),
-        ],
-      ),
-      child: Stack(
-        children: <Widget>[
-          GestureDetector(
-            child: Hero(
-              tag: index,
-              child: Image.network(
-                dataList[index],
-                fit: BoxFit.fill,
-                width: double.infinity,
-                height: double.infinity,
-              ),
-            ),
-            onTap: () {
-              goDetail(context, dataList[index], index);
-            },
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 40.0,
-              color: Color.fromRGBO(255, 255, 255, 0.6),
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.only(left: 10.0),
-              child: Text(
-                '第${index}条数据',
-                style: TextStyle(
-                  inherit: false,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  void goDetail(BuildContext context, imgUrl, index) {
-    Navigator.push(
-      context,
-      MaterialPageRoute<void>(
-        builder: (BuildContext context) {
-          return Scaffold(
-            body: SizedBox.expand(
-              child: Hero(
-                tag: index,
-                child: new DetailPage(
-                  imgUrl: imgUrl,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -193,11 +121,11 @@ class _HomePageState extends State<HomePage>
             itemBuilder: (BuildContext context, int index) {
               if (index == 0) {
                 return Container(
-                  height: 180.0,
+                  height: 240.0,
                   child: Stack(
                     children: <Widget>[
                       Container(
-                        height: 180.0,
+                        height: 280.0,
                         width: double.infinity,
                         child: Stack(
                           children: <Widget>[
@@ -253,8 +181,8 @@ class _HomePageState extends State<HomePage>
                     ],
                   ),
                 );
-              } else {
-                return _renderItem(index);
+              } else{
+                return HomeItemWidget(index: index, dataList: dataList);
               }
             },
           ),
@@ -265,92 +193,3 @@ class _HomePageState extends State<HomePage>
     );
   }
 }
-
-// RefreshIndicator(
-//   key: _refreshIndicatorKey,
-//   onRefresh: _refresh,
-//   child: CustomScrollView(
-//     slivers: <Widget>[
-//       SliverPersistentHeader(
-//         pinned: false,
-//         floating: false,
-//         delegate: SliverAppBarDelegate(
-//           minHeight: 60.0,
-//           maxHeight: 180.0,
-//           child: Container(
-//               child: Stack(
-//             children: <Widget>[
-//               Container(
-//                 height: 180.0,
-//                 width: double.infinity,
-//                 child: Stack(
-//                   children: <Widget>[
-//                     Image.asset(
-//                       model.imageUrl ?? 'assets/images/slide1.png',
-//                       fit: BoxFit.fill,
-//                       width: double.infinity,
-//                       height: double.infinity,
-//                     ),
-//                     BackdropFilter(
-//                       filter:
-//                           new ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-//                       child: new Container(
-//                         color: Colors.white.withOpacity(0.1),
-//                         width: double.infinity,
-//                         height: double.infinity,
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//               Container(
-//                 padding: EdgeInsets.symmetric(vertical: 20.0),
-//                 child: Swiper(
-//                   itemBuilder: (BuildContext context, int index) {
-//                     return Hero(
-//                       tag: index,
-//                       child: ClipRRect(
-//                         borderRadius: BorderRadius.circular(10),
-//                         child: Image.asset(
-//                           imgUrlList[index],
-//                           fit: BoxFit.fill,
-//                         ),
-//                       ),
-//                     );
-//                   },
-//                   onIndexChanged: (index) {
-//                     model.setSlideImage(imgUrlList[index]);
-//                   },
-//                   itemCount: 4,
-//                   viewportFraction: 0.8,
-//                   scale: 0.9,
-//                   onTap: (index) {
-//                     // return new MaterialApp(
-//                     //   routes: {
-//                     //     "/": (_) => new WebviewScaffold(
-//                     //           url: "https://www.baidu.com",
-//                     //           appBar: new AppBar(
-//                     //             title: new Text(imgUrlList[index]),
-//                     //           ),
-//                     //         )
-//                     //   },
-//                     // );
-//                     goDetail(context, imgUrlList[index], index);
-//                   },
-//                 ),
-//               )
-//             ],
-//           )),
-//         ),
-//       ),
-//       SliverList(
-//         delegate: SliverChildBuilderDelegate(
-//           (BuildContext context, int index) {
-//             return _renderItem(index);
-//           },
-//           childCount: dataList.length,
-//         ),
-//       )
-//     ],
-//   ),
-// );
