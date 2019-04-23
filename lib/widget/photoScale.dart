@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class Photo extends StatefulWidget {
-  //source 1、assets   2、file   3、net
+  //source: assets  file  net
   const Photo({Key key, this.url, this.source}) : super(key: key);
   final url;
-  final source;
+  final String source;
   @override
   State<StatefulWidget> createState() {
     return PhotoState();
@@ -88,12 +88,12 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
             transform: Matrix4.identity()
               ..translate(_offset.dx, _offset.dy)
               ..scale(_scale),
-            child: widget.source == 1
+            child: widget.source == 'assets'
                 ? Image.asset(
                     widget.url,
                     // fit: BoxFit.cover,
                   )
-                : (widget.source == 2
+                : (widget.source == 'file'
                     ? Image.file(
                         widget.url,
                         // width: 260.0,
@@ -107,5 +107,3 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
     );
   }
 }
-
-

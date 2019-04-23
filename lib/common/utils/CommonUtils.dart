@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:syk_flutter/widget/Triangle.dart';
 
 class CommonUtils {
   static showLoadingDialog(BuildContext context, String msg) {
@@ -71,13 +72,12 @@ class CommonUtils {
     );
   }
 
-  static showChooseDialog(BuildContext context, TapDownDetails details) {
-    final double dx = details.globalPosition.dx;
-    final double dy = details.globalPosition.dy;
+  static showChooseDialog(BuildContext context, Size size, var vector3) {
+    final double wx = size.height;
+    final double dx = vector3[0];
+    final double dy = vector3[1];
     final double w = MediaQuery.of(context).size.width;
     final double h = MediaQuery.of(context).size.height;
-    print(dy);
-    print(h);
 
     return showDialog(
       context: context,
@@ -100,9 +100,9 @@ class CommonUtils {
                   },
                 ),
                 Positioned(
-                  left: 20.0,
-                  top: dy < h / 2 ? dy : null,
-                  bottom: dy < h / 2 ? null : (h - dy + 20.0),
+                  left: 10.0,
+                  top: dy < h / 2 ? dy + wx / 2 : null,
+                  bottom: dy < h / 2 ? null : (h - dy + wx / 2),
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(
@@ -110,29 +110,55 @@ class CommonUtils {
                       ),
                       color: Colors.white,
                     ),
-                    width: w - 40.0,
-                    child: Column(
-                      children: <Widget>[
-                        ListTile(
-                            leading: Icon(Icons.highlight_off),
-                            title: Text('不感兴趣'),
-                            subtitle: Text('减少这类内容')),
-                        Divider(),
-                        ListTile(
-                            leading: Icon(Icons.error_outline),
-                            title: Text('反馈垃圾内容'),
-                            subtitle: Text('低俗、标题党等')),
-                        Divider(),
-                        ListTile(
-                            leading: Icon(Icons.not_interested),
-                            title: Text('屏蔽'),
-                            subtitle: Text('请选择屏蔽的广告类型')),
-                        Divider(),
-                        ListTile(
-                          leading: Icon(Icons.help_outline),
-                          title: Text('为什么看到此广告'),
-                        ),
-                      ],
+                    width: w - 20.0,
+                    child: GestureDetector(
+                      child: Column(
+                        children: <Widget>[
+                          ListTile(
+                              leading: Icon(Icons.highlight_off),
+                              title: Text('不感兴趣'),
+                              subtitle: Text('减少这类内容')),
+                          Divider(),
+                          ListTile(
+                              leading: Icon(Icons.error_outline),
+                              title: Text('反馈垃圾内容'),
+                              subtitle: Text('低俗、标题党等')),
+                          Divider(),
+                          ListTile(
+                              leading: Icon(Icons.not_interested),
+                              title: Text('屏蔽'),
+                              subtitle: Text('请选择屏蔽的广告类型')),
+                          Divider(),
+                          ListTile(
+                            leading: Icon(Icons.help_outline),
+                            title: Text('为什么看到此广告'),
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        // final snackBar = SnackBar(
+                        //   content: Text('随便写着玩的，别点了...'),
+                        //   backgroundColor: Colors.blueAccent,
+                        //   duration: Duration(minutes: 1), // 持续时间
+                        //   //animation,
+                        // );
+                        // Scaffold.of(context).showSnackBar(snackBar);
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: dx - 10.0,
+                  top: dy < h / 2 ? dy - wx / 2 : null,
+                  bottom: dy < h / 2 ? null : (h - dy - wx / 2),
+                  child: ClipPath(
+                    clipper: Triangle(dir: dy - h / 2),
+                    child: Container(
+                      width: 30.0,
+                      height: 30.0,
+                      color: Colors.white,
+                      child: null,
                     ),
                   ),
                 ),

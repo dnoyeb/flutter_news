@@ -6,7 +6,6 @@ class HomeItemWidget extends StatelessWidget {
   final int index;
   final List dataList;
   HomeItemWidget({Key key, this.index, this.dataList}) : super(key: key);
-
   void goDetail(BuildContext context, imgUrl, index) {
     Navigator.push(
       context,
@@ -24,15 +23,6 @@ class HomeItemWidget extends StatelessWidget {
           );
         },
       ),
-    );
-  }
-
-  Widget closeTap(BuildContext context) {
-    return GestureDetector(
-      child: Icon(Icons.close),
-      onTapDown: (TapDownDetails details) {
-        CommonUtils.showChooseDialog(context, details);
-      },
     );
   }
 
@@ -66,7 +56,7 @@ class HomeItemWidget extends StatelessWidget {
                 maxLines: 1,
                 textAlign: TextAlign.left,
               ),
-              closeTap(context)
+              CloseTap()
             ],
           ),
         ],
@@ -129,7 +119,7 @@ class HomeItemWidget extends StatelessWidget {
                 maxLines: 1,
                 textAlign: TextAlign.left,
               ),
-              closeTap(context)
+              CloseTap()
             ],
           ),
         ],
@@ -170,7 +160,7 @@ class HomeItemWidget extends StatelessWidget {
                       maxLines: 1,
                       textAlign: TextAlign.left,
                     ),
-                    closeTap(context)
+                    CloseTap()
                   ],
                 ),
               ],
@@ -212,6 +202,32 @@ class HomeItemWidget extends StatelessWidget {
       ),
       onTap: () {
         goDetail(context, dataList[index], index);
+      },
+    );
+  }
+}
+
+class CloseTap extends StatefulWidget {
+  @override
+  _CloseTapTapState createState() => _CloseTapTapState();
+}
+
+class _CloseTapTapState extends State<CloseTap> with WidgetsBindingObserver {
+  void _onAfterRendering(Duration timeStamp) {
+    RenderObject renderObject = context.findRenderObject();
+    Size size = renderObject.paintBounds.size;
+    var vector3 = renderObject.getTransformTo(null)?.getTranslation();
+    CommonUtils.showChooseDialog(context, size, vector3);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: Icon(Icons.close),
+      onTapDown: (TapDownDetails details) {
+        WidgetsBinding.instance.addPostFrameCallback(_onAfterRendering);
+        setState(() {
+        });
       },
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:syk_flutter/widget/PhotoScale.dart';
 import '../widget/SliverAppBarDelegate.dart';
 
 class DetailPage extends StatefulWidget {
@@ -9,6 +10,28 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
+  void showPhoto(BuildContext context, url, source, tag) {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) {
+          return Scaffold(
+            appBar: AppBar(title: Text('图片')),
+            body: SizedBox.expand(
+              child: Hero(
+                tag: tag,
+                child: new Photo(
+                  url: url,
+                  source: source,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -31,30 +54,38 @@ class _DetailPageState extends State<DetailPage> {
           delegate: SliverAppBarDelegate(
             minHeight: 80.0,
             maxHeight: 220.0,
-            child: Stack(
-              overflow: Overflow.visible,
-              children: <Widget>[
-                Container(
-                  child: Image.network(
-                    widget.imgUrl,
-                    fit: BoxFit.fill,
-                    height: 220.0,
-                    width: double.infinity,
+            child: GestureDetector(
+              child: Stack(
+                overflow: Overflow.visible,
+                children: <Widget>[
+                  Container(
+                    child: Hero(
+                      tag: widget.imgUrl,
+                      child: Image.network(
+                        widget.imgUrl,
+                        fit: BoxFit.fill,
+                        height: 220.0,
+                        width: double.infinity,
+                      ),
+                    ),
                   ),
-                ),
-                AppBar(
-                  title: Text("Detail"),
-                  automaticallyImplyLeading: true,
-                  backgroundColor: Color.fromRGBO(2, 2, 2, 0),
-                ),
-                Positioned(
-                  bottom: -20.0,
-                  right: 30.0,
-                  child: FloatingActionButton(
-                    child: Icon(Icons.favorite),
+                  AppBar(
+                    title: Text("Detail"),
+                    automaticallyImplyLeading: true,
+                    backgroundColor: Color.fromRGBO(2, 2, 2, 0),
                   ),
-                )
-              ],
+                  Positioned(
+                    bottom: -20.0,
+                    right: 30.0,
+                    child: FloatingActionButton(
+                      child: Icon(Icons.favorite),
+                    ),
+                  )
+                ],
+              ),
+              onTap: () {
+                showPhoto(context, widget.imgUrl, 'net', widget.imgUrl);
+              },
             ),
           ),
         ),
