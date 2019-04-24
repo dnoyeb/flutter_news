@@ -14,35 +14,29 @@ class VideoPortWidget extends StatefulWidget {
 
 class _VideoPortWidgetState extends State<VideoPortWidget> {
   VideoPlayerController _controller;
-
+  bool playEnd = false;
   @override
   void initState() {
     super.initState();
-    if (widget.source == 'assets') {
-      _controller = VideoPlayerController.asset(widget.url)
-        ..initialize().then((_) {
-          setState(() {});
-        })
-        ..addListener(() {
-          print(_controller);
-        });
-    } else if (widget.source == 'file') {
-      _controller = VideoPlayerController.file(widget.url)
-        ..initialize().then((_) {
-          setState(() {});
-        })
-        ..addListener(() {
-          print(_controller);
-        });
-    } else {
-      _controller = VideoPlayerController.network(widget.url)
-        ..initialize().then((_) {
-          setState(() {});
-        })
-        ..addListener(() {
-          print(_controller);
-        });
-    }
+    _controller = widget.source == 'assets'
+        ? VideoPlayerController.asset(widget.url)
+        : widget.source == 'file'
+            ? VideoPlayerController.file(widget.url)
+            : VideoPlayerController.network(widget.url)
+      ..initialize().then((_) {
+        setState(() {});
+      })
+      ..addListener(() {
+        if (_controller.value.duration <= _controller.value.position) {
+          setState(() {
+            playEnd = true;
+          });
+        } else if (playEnd = true) {
+          playEnd = false;
+        }
+        print(_controller);
+        setState(() {});
+      });
   }
 
   @override
@@ -53,117 +47,205 @@ class _VideoPortWidgetState extends State<VideoPortWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final double w = MediaQuery.of(context).size.width;
+    Size videoSize;
+    final RenderBox box = context.findRenderObject();
+    if (_controller.value.initialized) {
+      setState(() {
+        videoSize = box.size;
+      });
+    }
     return _controller.value.initialized
-        ? Stack(
-            children: <Widget>[
-              AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: VideoPlayer(_controller),
-              ),
-              Positioned(
-                bottom: 0.0,
-                left: 0.0,
-                height: 50.0,
-                width: w,
-                child: Container(
+        ? AspectRatio(
+            aspectRatio: _controller.value.aspectRatio,
+            child: Stack(
+              alignment: AlignmentDirectional.bottomStart,
+              children: <Widget>[
+                VideoPlayer(_controller),
+                Container(
                   color: Color.fromARGB(80, 0, 0, 0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
-                      GestureDetector(
-                        child: _controller.value.isPlaying
-                            ? Icon(
-                                Icons.pause,
-                                color: Colors.white,
-                              )
-                            : Icon(
-                                Icons.play_arrow,
-                                color: Colors.white,
-                              ),
-                        onTap: () {
-                          setState(() {
-                            _controller.value.isPlaying
-                                ? _controller.pause()
-                                : _controller.play();
-                          });
-                        },
+                      Expanded(
+                        flex: 1,
+                        child: GestureDetector(
+                          child: playEnd
+                              ? Icon(
+                                  Icons.play_arrow,
+                                  color: Colors.white,
+                                )
+                              : _controller.value.isPlaying
+                                  ? Icon(
+                                      Icons.pause,
+                                      color: Colors.white,
+                                    )
+                                  : Icon(
+                                      Icons.play_arrow,
+                                      color: Colors.white,
+                                    ),
+                          onTap: () {
+                            setState(() {
+                              playEnd
+                                  ? _controller
+                                      .seekTo(_controller.value.duration * 0)
+                                  : _controller.value.isPlaying
+                                      ? _controller.pause()
+                                      : _controller.play();
+                              playEnd = false;
+                            });
+                          },
+                        ),
                       ),
-                      Text(
-                        '20:25/54:16',
-                        style: TextStyle(
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          '${_controller.value.position.toString().substring(0, 7)}/${_controller.value.duration.toString().substring(0, 7)}',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Expanded(
+                        flex: 6,
+                        child: Container(
+                          height: 50.0,
+                          child: DIYVideoProgressIndicator(
+                            _controller,
+                            allowScrubbing: true,
+                            videoSize: videoSize,
+                            padding: const EdgeInsets.only(top: 0.0),
+                            colors: VideoProgressColors(
+                              playedColor: Colors.blue,
+                              bufferedColor: Colors.grey[400],
+                              backgroundColor: Colors.grey[800],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Icon(
+                          Icons.crop_free,
                           color: Colors.white,
                         ),
-                      ),
-                      Container(
-                        height: 50.0,
-                        child: Stack(
-                          children: <Widget>[
-                            Container(
-                              //总进度条
-                              margin: EdgeInsets.only(top: 24.0),
-                              color: Colors.grey[800],
-                              width: w * 3 / 5,
-                              height: 2.0,
-                              alignment: Alignment.topLeft,
-                              child: UnconstrainedBox(
-                                //缓冲进度条
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[400],
-                                  ),
-                                  width: 100.0,
-                                  height: 2.0,
-                                  alignment: Alignment.topLeft,
-                                  child: UnconstrainedBox(
-                                    //播放进度条
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.orangeAccent,
-                                      ),
-                                      width: 50.0,
-                                      height: 2.0,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              top: 15,
-                              child: Icon(
-                                Icons.fiber_manual_record,
-                                size: 20.0,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Icon(
-                        Icons.crop_free,
-                        color: Colors.white,
                       ),
                     ],
                   ),
                 ),
-              )
-            ],
+              ],
+            ),
           )
         : Container();
+  }
+}
 
-    //   floatingActionButton: FloatingActionButton(
-    //     onPressed: () {
-    //       setState(() {
-    //         _controller.value.isPlaying
-    //             ? _controller.pause()
-    //             : _controller.play();
-    //       });
-    //     },
-    //     child: Icon(
-    //       _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-    //     ),
-    //   ),
-    //   floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    // );
+class DIYVideoProgressIndicator extends StatefulWidget {
+  DIYVideoProgressIndicator(
+    this.controller, {
+    VideoProgressColors colors,
+    this.videoSize,
+    this.allowScrubbing,
+    this.padding = const EdgeInsets.only(top: 5.0),
+  }) : colors = colors ?? VideoProgressColors();
+
+  final VideoPlayerController controller;
+  final VideoProgressColors colors;
+  final bool allowScrubbing;
+  final Size videoSize;
+  final EdgeInsets padding;
+  @override
+  _DIYVideoProgressIndicatorState createState() =>
+      _DIYVideoProgressIndicatorState();
+}
+
+class _DIYVideoProgressIndicatorState extends State<DIYVideoProgressIndicator> {
+  VideoPlayerController get controller => widget.controller;
+
+  VideoProgressColors get colors => widget.colors;
+
+  @override
+  void initState() {
+    super.initState();
+    controller.addListener(() {});
+  }
+
+  @override
+  void deactivate() {
+    controller.removeListener(() {});
+    super.deactivate();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget progressIndicator;
+    if (controller.value.initialized) {
+      final int duration = controller.value.duration.inMilliseconds;
+      final int position = controller.value.position.inMilliseconds;
+
+      int maxBuffering = 0;
+      for (DurationRange range in controller.value.buffered) {
+        final int end = range.end.inMilliseconds;
+        if (end > maxBuffering) {
+          maxBuffering = end;
+        }
+      }
+
+      progressIndicator = Container(
+        child: Stack(
+          fit: StackFit.passthrough,
+          alignment: AlignmentDirectional.topStart,
+          children: <Widget>[
+            Positioned(
+                left: 1.0,
+                top: 25,
+                width: widget.videoSize.width / 2,
+                child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 15.0),
+                  child: SizedBox(
+                    height: 2.0,
+                    child: LinearProgressIndicator(
+                      value: maxBuffering / duration,
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(colors.bufferedColor),
+                      backgroundColor: colors.backgroundColor,
+                    ),
+                  ),
+                )),
+            Positioned(
+              width: widget.videoSize.width / 2,
+              left: 0.0,
+              top: 10.0,
+              child: Container(
+                child: Slider(
+                  value:
+                      (position / duration) < 1.0 ? (position / duration) : 1.0,
+                  activeColor: colors.playedColor,
+                  inactiveColor: Colors.transparent,
+                  onChanged: (double value) {
+                    if (!controller.value.initialized) {
+                      return;
+                    }
+                    final Duration position = controller.value.duration * value;
+                    controller.seekTo(position);
+                  },
+                ),
+              ),
+            )
+          ],
+        ),
+      );
+    } else {
+      progressIndicator = LinearProgressIndicator(
+        value: null,
+        valueColor: AlwaysStoppedAnimation<Color>(colors.playedColor),
+        backgroundColor: colors.backgroundColor,
+      );
+    }
+    final Widget paddedProgressIndicator = Padding(
+      padding: widget.padding,
+      child: progressIndicator,
+    );
+    return paddedProgressIndicator;
   }
 }
