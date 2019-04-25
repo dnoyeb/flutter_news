@@ -83,23 +83,35 @@ class HomeItemWidget extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Image.network(
-                    dataList[index],
-                    fit: BoxFit.fill,
-                    width: 135.0,
-                    height: 100.0,
+                  Expanded(
+                    flex: 1,
+                    child: Image.network(
+                      dataList[index],
+                      fit: BoxFit.fill,
+                      height: 100.0,
+                    ),
                   ),
-                  Image.network(
-                    dataList[index],
-                    fit: BoxFit.fill,
-                    width: 135.0,
-                    height: 100.0,
+                  SizedBox(
+                    width: 10.0,
                   ),
-                  Image.network(
-                    dataList[index],
-                    fit: BoxFit.fill,
-                    width: 135.0,
-                    height: 100.0,
+                  Expanded(
+                    flex: 1,
+                    child: Image.network(
+                      dataList[index],
+                      fit: BoxFit.fill,
+                      height: 100.0,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10.0,
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Image.network(
+                      dataList[index],
+                      fit: BoxFit.fill,
+                      height: 100.0,
+                    ),
                   ),
                 ],
               ),
@@ -128,53 +140,58 @@ class HomeItemWidget extends StatelessWidget {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Container(
-            width: 270.0,
-            height: 100.0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  '第三类Item格式凑点字数凑点字数凑点字数凑点字数凑点字数',
-                  style: TextStyle(
-                    inherit: false,
-                    fontSize: 20.0,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  maxLines: 2,
-                  textAlign: TextAlign.left,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      '中国青年网    35评论    5分钟前',
-                      style: TextStyle(
-                        inherit: false,
-                        fontSize: 14.0,
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 1,
-                      textAlign: TextAlign.left,
+          Expanded(
+            flex: 2,
+            child: Container(
+              width: 270.0,
+              height: 100.0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    '第三类Item格式凑点字数凑点字数凑点字数凑点字数凑点字数',
+                    style: TextStyle(
+                      inherit: false,
+                      fontSize: 20.0,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500,
                     ),
-                    CloseTap()
-                  ],
-                ),
-              ],
+                    maxLines: 2,
+                    textAlign: TextAlign.left,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        '中国青年网    35评论    5分钟前',
+                        style: TextStyle(
+                          inherit: false,
+                          fontSize: 14.0,
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        textAlign: TextAlign.left,
+                      ),
+                      CloseTap()
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-          Hero(
-            tag: index,
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 5.0),
-              child: Image.network(
-                dataList[index],
-                fit: BoxFit.fill,
-                width: 135.0,
-                height: 100.0,
+          Expanded(
+            flex: 1,
+            child: Hero(
+              tag: index,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
+                child: Image.network(
+                  dataList[index],
+                  fit: BoxFit.fill,
+                  height: 100.0,
+                ),
               ),
             ),
           ),
@@ -226,8 +243,7 @@ class _CloseTapTapState extends State<CloseTap> with WidgetsBindingObserver {
       child: Icon(Icons.close),
       onTapDown: (TapDownDetails details) {
         WidgetsBinding.instance.addPostFrameCallback(_onAfterRendering);
-        setState(() {
-        });
+        setState(() {});
       },
     );
   }

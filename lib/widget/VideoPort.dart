@@ -1,20 +1,45 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:screen/screen.dart';
+import 'package:flutter/services.dart';
 
 class VideoPortWidget extends StatefulWidget {
   final url;
   //source :assets   file   net
   final String source;
+  final isFullScreen;
 
-  VideoPortWidget({Key key, @required this.url, @required this.source})
-      : super(key: key);
+  /// Defines the system overlays visible after exiting fullscreen
+  final List<SystemUiOverlay> systemOverlaysAfterFullScreen;
+
+  /// Defines the set of allowed device orientations after exiting fullscreen
+  final List<DeviceOrientation> deviceOrientationsAfterFullScreen;
+
+  VideoPortWidget({
+    Key key,
+    @required this.url,
+    @required this.source,
+    this.isFullScreen = false,
+    this.systemOverlaysAfterFullScreen = SystemUiOverlay.values,
+    this.deviceOrientationsAfterFullScreen = const [
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ],
+  }) : super(key: key);
 
   _VideoPortWidgetState createState() => _VideoPortWidgetState();
 }
 
 class _VideoPortWidgetState extends State<VideoPortWidget> {
   VideoPlayerController _controller;
+
   bool playEnd = false;
+  double videoWidth;
+
   @override
   void initState() {
     super.initState();
@@ -34,7 +59,7 @@ class _VideoPortWidgetState extends State<VideoPortWidget> {
         } else if (playEnd = true) {
           playEnd = false;
         }
-        print(_controller);
+        // print(_controller);
         setState(() {});
       });
   }
@@ -47,28 +72,108 @@ class _VideoPortWidgetState extends State<VideoPortWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Size videoSize;
+    Future<dynamic> _pushFullScreenWidget(BuildContext context) async {
+      final isAndroid = Theme.of(context).platform == TargetPlatform.android;
+      // final TransitionRoute<Null> route = PageRouteBuilder<Null>(
+      //   settings: RouteSettings(isInitialRoute: false),
+      //   pageBuilder: _fullScreenRoutePageBuilder,
+      // );
+
+      // if (!widget.controller.allowedScreenSleep) {
+      //   Screen.keepOn(true);
+      // }
+      Screen.keepOn(true);
+      // await Navigator.push(
+      //   context,
+      //   new PageRouteBuilder(
+      //     transitionDuration: const Duration(milliseconds: 300),
+      //     pageBuilder: (context, _, __) => Scaffold(
+      //           resizeToAvoidBottomPadding: false,
+      //           body: Container(
+      //             alignment: Alignment.center,
+      //             color: Colors.black,
+      //             child: VideoPortWidget(
+      //               url: widget.url,
+      //               source: widget.source,
+      //               isFullScreen: true,
+      //             ),
+      //           ),
+      //         ),
+      //     transitionsBuilder:
+      //         (_, Animation<double> animation, __, Widget child) =>
+      //             new FadeTransition(
+      //               opacity: animation,
+      //               child: new RotationTransition(
+      //                 turns: new Tween<double>(begin: 0.0, end: 1.0)
+      //                     .animate(animation),
+      //                 child: child,
+      //               ),
+      //             ),
+      //   ),
+      // );
+      await Navigator.push(
+        context,
+        MaterialPageRoute<void>(
+          builder: (BuildContext context) {
+            SystemChrome.setEnabledSystemUIOverlays([]);
+            if (isAndroid) {
+              SystemChrome.setPreferredOrientations([
+                DeviceOrientation.landscapeLeft,
+                DeviceOrientation.landscapeRight,
+              ]);
+            }
+            return Scaffold(
+              resizeToAvoidBottomPadding: false,
+              body: Container(
+                alignment: Alignment.center,
+                color: Colors.black,
+                child: VideoPortWidget(
+                  url: widget.url,
+                  source: widget.source,
+                  isFullScreen: true,
+                ),
+              ),
+            );
+          },
+        ),
+      );
+      bool isKeptOn = await Screen.isKeptOn;
+      if (isKeptOn) {
+        Screen.keepOn(false);
+      }
+
+      SystemChrome.setEnabledSystemUIOverlays(
+          widget.systemOverlaysAfterFullScreen);
+      SystemChrome.setPreferredOrientations(
+          widget.deviceOrientationsAfterFullScreen);
+    }
+
     final RenderBox box = context.findRenderObject();
     if (_controller.value.initialized) {
       setState(() {
-        videoSize = box.size;
+        videoWidth = box.size.width;
       });
     }
+
     return _controller.value.initialized
         ? AspectRatio(
             aspectRatio: _controller.value.aspectRatio,
             child: Stack(
               alignment: AlignmentDirectional.bottomStart,
               children: <Widget>[
+                // Hero(
+                //   tag: widget.url.toString(),
+                //   child: VideoPlayer(_controller),
+                // ),
                 VideoPlayer(_controller),
                 Container(
                   color: Color.fromARGB(80, 0, 0, 0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
-                      Expanded(
-                        flex: 1,
-                        child: GestureDetector(
+                      GestureDetector(
+                        child: Container(
+                          width: 40.0,
                           child: playEnd
                               ? Icon(
                                   Icons.play_arrow,
@@ -83,52 +188,59 @@ class _VideoPortWidgetState extends State<VideoPortWidget> {
                                       Icons.play_arrow,
                                       color: Colors.white,
                                     ),
-                          onTap: () {
-                            setState(() {
-                              playEnd
-                                  ? _controller
-                                      .seekTo(_controller.value.duration * 0)
-                                  : _controller.value.isPlaying
-                                      ? _controller.pause()
-                                      : _controller.play();
-                              playEnd = false;
-                            });
-                          },
+                        ),
+                        onTap: () {
+                          setState(() {
+                            playEnd
+                                ? _controller
+                                    .seekTo(_controller.value.duration * 0)
+                                : _controller.value.isPlaying
+                                    ? _controller.pause()
+                                    : _controller.play();
+                            playEnd = false;
+                          });
+                        },
+                      ),
+                      Container(
+                        width: 80.0,
+                        child: Text(
+                          '${_controller.value.position.toString().substring(2, 7)}/${_controller.value.duration.toString().substring(2, 7)}',
+                          style: TextStyle(color: Colors.white, fontSize: 12.0),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          '${_controller.value.position.toString().substring(0, 7)}/${_controller.value.duration.toString().substring(0, 7)}',
-                          style: TextStyle(
+                      Container(
+                        height: 50.0,
+                        width: 240.0,
+                        child: DIYVideoProgressIndicator(
+                          _controller,
+                          allowScrubbing: true,
+                          videoWidth: 240.0,
+                          padding: const EdgeInsets.only(top: 0.0),
+                          colors: VideoProgressColors(
+                            playedColor: Colors.blue,
+                            bufferedColor: Colors.grey[400],
+                            backgroundColor: Colors.grey[800],
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        child: Container(
+                          width: 40.0,
+                          child: Icon(
+                            widget.isFullScreen
+                                ? Icons.fullscreen_exit
+                                : Icons.fullscreen,
                             color: Colors.white,
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                      ),
-                      Expanded(
-                        flex: 6,
-                        child: Container(
-                          height: 50.0,
-                          child: DIYVideoProgressIndicator(
-                            _controller,
-                            allowScrubbing: true,
-                            videoSize: videoSize,
-                            padding: const EdgeInsets.only(top: 0.0),
-                            colors: VideoProgressColors(
-                              playedColor: Colors.blue,
-                              bufferedColor: Colors.grey[400],
-                              backgroundColor: Colors.grey[800],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Icon(
-                          Icons.crop_free,
-                          color: Colors.white,
-                        ),
+                        onTap: () {
+                          widget.isFullScreen
+                              ? Navigator.of(context).pop()
+                              : _pushFullScreenWidget(context);
+                        },
                       ),
                     ],
                   ),
@@ -144,7 +256,7 @@ class DIYVideoProgressIndicator extends StatefulWidget {
   DIYVideoProgressIndicator(
     this.controller, {
     VideoProgressColors colors,
-    this.videoSize,
+    this.videoWidth,
     this.allowScrubbing,
     this.padding = const EdgeInsets.only(top: 5.0),
   }) : colors = colors ?? VideoProgressColors();
@@ -152,7 +264,7 @@ class DIYVideoProgressIndicator extends StatefulWidget {
   final VideoPlayerController controller;
   final VideoProgressColors colors;
   final bool allowScrubbing;
-  final Size videoSize;
+  final double videoWidth;
   final EdgeInsets padding;
   @override
   _DIYVideoProgressIndicatorState createState() =>
@@ -199,7 +311,7 @@ class _DIYVideoProgressIndicatorState extends State<DIYVideoProgressIndicator> {
             Positioned(
                 left: 1.0,
                 top: 25,
-                width: widget.videoSize.width / 2,
+                width: widget.videoWidth,
                 child: Container(
                   margin: EdgeInsets.symmetric(horizontal: 15.0),
                   child: SizedBox(
@@ -213,7 +325,7 @@ class _DIYVideoProgressIndicatorState extends State<DIYVideoProgressIndicator> {
                   ),
                 )),
             Positioned(
-              width: widget.videoSize.width / 2,
+              width: widget.videoWidth,
               left: 0.0,
               top: 10.0,
               child: Container(

@@ -7,7 +7,6 @@ import 'package:syk_flutter/widget/HomeItem.dart';
 import '../common/model/MainModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:syk_flutter/page/Detail.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import './WebviewPage.dart';
 

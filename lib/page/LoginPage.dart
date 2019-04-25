@@ -78,7 +78,11 @@ class _LoginPageState extends State<LoginPage> {
       await LocalStorage.save('password', pwController.value.toString());
       await LocalStorage.save('hasLogin', 'yes');
       new Timer(Duration(seconds: 2), () {
-        Navigator.pushReplacementNamed(context, '/tab');
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/tab',
+          (route) => route == null,
+        );
       });
     }
   }

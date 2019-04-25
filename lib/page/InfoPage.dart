@@ -14,6 +14,7 @@ class _InfoPageState extends State<InfoPage> {
         child: VideoPortWidget(
           url: 'assets/videos/video.mp4',
           source: 'assets',
+          isFullScreen: false,
         ),
       ),
     );

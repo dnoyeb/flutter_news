@@ -25,8 +25,16 @@ class _WelcomePageState extends State<WelcomePage> {
   void initUser() async {
     var hasLogin = await LocalStorage.get('hasLogin');
     hasLogin == null
-        ? Navigator.pushReplacementNamed(context, '/login')
-        : Navigator.pushReplacementNamed(context, '/tab');
+        ? Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/login',
+             (route) => route == null,
+          )
+        : Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/tab',
+             (route) => route == null,
+          );
   }
 
   // @override
