@@ -10,13 +10,16 @@ class TabPage extends StatefulWidget {
   _TabPageState createState() => _TabPageState();
 }
 
-class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
+class _TabPageState extends State<TabPage>
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   // List<Widget> pages = List<Widget>();
   TabController _tabController;
+  bool active = false;
   @override
   void initState() {
     // pages..add(HomePage())..add(InfoPage())..add(MyPage());
     _tabController = TabController(vsync: this, length: 3);
+     
     super.initState();
   }
 
@@ -28,6 +31,7 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       drawer: new MyDrawer(),
       body: TabBarView(
@@ -68,6 +72,10 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
       // ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 
   // void _onItemTapped(int index) {
   //   setState(() {

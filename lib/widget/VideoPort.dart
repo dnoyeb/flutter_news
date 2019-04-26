@@ -6,10 +6,9 @@ import 'package:screen/screen.dart';
 import 'package:flutter/services.dart';
 
 class VideoPortWidget extends StatefulWidget {
-  final url;
   //source :assets   file   net
-  final String source;
   final isFullScreen;
+  final controller;
 
   /// Defines the system overlays visible after exiting fullscreen
   final List<SystemUiOverlay> systemOverlaysAfterFullScreen;
@@ -19,8 +18,7 @@ class VideoPortWidget extends StatefulWidget {
 
   VideoPortWidget({
     Key key,
-    @required this.url,
-    @required this.source,
+    @required this.controller,
     this.isFullScreen = false,
     this.systemOverlaysAfterFullScreen = SystemUiOverlay.values,
     this.deviceOrientationsAfterFullScreen = const [
@@ -35,41 +33,33 @@ class VideoPortWidget extends StatefulWidget {
 }
 
 class _VideoPortWidgetState extends State<VideoPortWidget> {
-  VideoPlayerController _controller;
-
   bool playEnd = false;
-  double videoWidth;
-
+  VideoPlayerController get controller => widget.controller;
   @override
   void initState() {
     super.initState();
-    _controller = widget.source == 'assets'
-        ? VideoPlayerController.asset(widget.url)
-        : widget.source == 'file'
-            ? VideoPlayerController.file(widget.url)
-            : VideoPlayerController.network(widget.url)
-      ..initialize().then((_) {
-        setState(() {});
-      })
-      ..addListener(() {
-        if (_controller.value.duration <= _controller.value.position) {
-          setState(() {
-            playEnd = true;
-          });
-        } else if (playEnd = true) {
-          playEnd = false;
-        }
-        // print(_controller);
-        setState(() {});
-      });
+    if (!controller.value.initialized) {
+      controller
+        ..initialize().then((_) {
+          setState(() {});
+        })
+        ..addListener(() {
+          if (controller.value.duration <= controller.value.position) {
+            setState(() {
+              playEnd = true;
+            });
+          } else if (playEnd = true) {
+            playEnd = false;
+          }
+          // print(_controller);
+        });
+    }
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
+  double setValue = 0.0;
+  bool isDragLeft = true;
+  bool isDraging = false;
+  bool showMaskTap = false;
   @override
   Widget build(BuildContext context) {
     Future<dynamic> _pushFullScreenWidget(BuildContext context) async {
@@ -79,7 +69,7 @@ class _VideoPortWidgetState extends State<VideoPortWidget> {
       //   pageBuilder: _fullScreenRoutePageBuilder,
       // );
 
-      // if (!widget.controller.allowedScreenSleep) {
+      // if (!controller.allowedScreenSleep) {
       //   Screen.keepOn(true);
       // }
       Screen.keepOn(true);
@@ -128,8 +118,7 @@ class _VideoPortWidgetState extends State<VideoPortWidget> {
                 alignment: Alignment.center,
                 color: Colors.black,
                 child: VideoPortWidget(
-                  url: widget.url,
-                  source: widget.source,
+                  controller: controller,
                   isFullScreen: true,
                 ),
               ),
@@ -148,25 +137,140 @@ class _VideoPortWidgetState extends State<VideoPortWidget> {
           widget.deviceOrientationsAfterFullScreen);
     }
 
-    final RenderBox box = context.findRenderObject();
-    if (_controller.value.initialized) {
-      setState(() {
-        videoWidth = box.size.width;
-      });
-    }
-
-    return _controller.value.initialized
+    return controller.value.initialized
         ? AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
+            aspectRatio: controller.value.aspectRatio,
             child: Stack(
               alignment: AlignmentDirectional.bottomStart,
               children: <Widget>[
-                // Hero(
-                //   tag: widget.url.toString(),
-                //   child: VideoPlayer(_controller),
-                // ),
-                VideoPlayer(_controller),
-                Container(
+                Stack(
+                  children: <Widget>[
+                    VideoPlayer(controller),
+                    Positioned(
+                      top: 0.0,
+                      left: 0.0,
+                      right: 0.0,
+                      bottom: 0.0,
+                      child: GestureDetector(
+                        child: Container(
+                          color: isDraging||showMaskTap
+                              ? Color.fromRGBO(0, 0, 0, 0.5)
+                              : Color.fromRGBO(0, 0, 0, 0),
+                          child: Center(
+                            child: isDraging&&!showMaskTap
+                                ? Container(
+                                    width: 100.0,
+                                    height: 100.0,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(5.0)),
+                                      color: Color.fromRGBO(0, 0, 0, 0.8),
+                                    ),
+                                    padding: EdgeInsets.all(20.0),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        Icon(
+                                          isDragLeft
+                                              ? Icons.brightness_6
+                                              : Icons.volume_up,
+                                          size: 40.0,
+                                          color: Colors.white,
+                                        ),
+                                        SizedBox(
+                                          height: 10.0,
+                                        ),
+                                        LinearProgressIndicator(
+                                          value: setValue,
+                                          backgroundColor: Colors.grey,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.white),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : Container(),
+                          ),
+                        ),
+                        onHorizontalDragUpdate: (DragUpdateDetails details) {
+                          print(details);
+                        },
+                        onVerticalDragStart: (DragStartDetails details) {
+                          isDragLeft =
+                              details.globalPosition.dx < context.size.width / 2
+                                  ? true
+                                  : false;
+                        },
+                        onVerticalDragUpdate:
+                            (DragUpdateDetails details) async {
+                          if (isDragLeft) {
+                            double brightness = await Screen.brightness;
+
+                            if (details.delta.dy > 0) {
+                              brightness -= 0.1;
+                            } else {
+                              brightness += 0.1;
+                            }
+
+                            brightness = brightness > 1.0
+                                ? 1.0
+                                : brightness < 0 ? 0 : brightness;
+                            Screen.setBrightness(brightness);
+                            setState(() {
+                              isDraging = true;
+                              setValue = brightness;
+                            });
+                          } else {
+                            //音量控制
+                            double volume = controller.value.volume;
+                            if (details.delta.dy > 0) {
+                              volume -= 0.1;
+                            } else {
+                              volume += 0.1;
+                            }
+                            volume =
+                                volume > 1.0 ? 1.0 : volume < 0 ? 0 : volume;
+                            controller.setVolume(volume);
+                            setState(() {
+                              isDraging = true;
+                              setValue = volume;
+                            });
+                          }
+                        },
+                        onVerticalDragEnd: (DragEndDetails) {
+                          setState(() {
+                            isDraging = false;
+                          });
+                        },
+                        onVerticalDragCancel: () {
+                          setState(() {
+                            isDraging = false;
+                          });
+                        },
+                        onHorizontalDragEnd: (DragEndDetails) {
+                          setState(() {
+                            isDraging = false;
+                          });
+                        },
+                        onHorizontalDragCancel: () {
+                          setState(() {
+                            isDraging = false;
+                          });
+                        },
+                        onTap: () {
+                          setState(() {
+                            showMaskTap = !showMaskTap;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                showMaskTap?Container(
                   color: Color.fromARGB(80, 0, 0, 0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -179,7 +283,7 @@ class _VideoPortWidgetState extends State<VideoPortWidget> {
                                   Icons.play_arrow,
                                   color: Colors.white,
                                 )
-                              : _controller.value.isPlaying
+                              : controller.value.isPlaying
                                   ? Icon(
                                       Icons.pause,
                                       color: Colors.white,
@@ -192,11 +296,11 @@ class _VideoPortWidgetState extends State<VideoPortWidget> {
                         onTap: () {
                           setState(() {
                             playEnd
-                                ? _controller
-                                    .seekTo(_controller.value.duration * 0)
-                                : _controller.value.isPlaying
-                                    ? _controller.pause()
-                                    : _controller.play();
+                                ? controller
+                                    .seekTo(controller.value.duration * 0)
+                                : controller.value.isPlaying
+                                    ? controller.pause()
+                                    : controller.play();
                             playEnd = false;
                           });
                         },
@@ -204,25 +308,25 @@ class _VideoPortWidgetState extends State<VideoPortWidget> {
                       Container(
                         width: 80.0,
                         child: Text(
-                          '${_controller.value.position.toString().substring(2, 7)}/${_controller.value.duration.toString().substring(2, 7)}',
+                          '${controller.value.position.toString().substring(2, 7)}/${controller.value.duration.toString().substring(2, 7)}',
                           style: TextStyle(color: Colors.white, fontSize: 12.0),
                           textAlign: TextAlign.center,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      Container(
-                        height: 50.0,
-                        width: 240.0,
-                        child: DIYVideoProgressIndicator(
-                          _controller,
-                          allowScrubbing: true,
-                          videoWidth: 240.0,
-                          padding: const EdgeInsets.only(top: 0.0),
-                          colors: VideoProgressColors(
-                            playedColor: Colors.blue,
-                            bufferedColor: Colors.grey[400],
-                            backgroundColor: Colors.grey[800],
+                      Expanded(
+                        child: Container(
+                          height: 50.0,
+                          child: DIYVideoProgressIndicator(
+                            controller,
+                            allowScrubbing: true,
+                            padding: const EdgeInsets.only(top: 0.0),
+                            colors: VideoProgressColors(
+                              playedColor: Colors.blue,
+                              bufferedColor: Colors.grey[400],
+                              backgroundColor: Colors.grey[800],
+                            ),
                           ),
                         ),
                       ),
@@ -244,7 +348,7 @@ class _VideoPortWidgetState extends State<VideoPortWidget> {
                       ),
                     ],
                   ),
-                ),
+                ):Container(),
               ],
             ),
           )
@@ -256,7 +360,6 @@ class DIYVideoProgressIndicator extends StatefulWidget {
   DIYVideoProgressIndicator(
     this.controller, {
     VideoProgressColors colors,
-    this.videoWidth,
     this.allowScrubbing,
     this.padding = const EdgeInsets.only(top: 5.0),
   }) : colors = colors ?? VideoProgressColors();
@@ -264,7 +367,6 @@ class DIYVideoProgressIndicator extends StatefulWidget {
   final VideoPlayerController controller;
   final VideoProgressColors colors;
   final bool allowScrubbing;
-  final double videoWidth;
   final EdgeInsets padding;
   @override
   _DIYVideoProgressIndicatorState createState() =>
@@ -275,16 +377,25 @@ class _DIYVideoProgressIndicatorState extends State<DIYVideoProgressIndicator> {
   VideoPlayerController get controller => widget.controller;
 
   VideoProgressColors get colors => widget.colors;
+  _DIYVideoProgressIndicatorState() {
+    listener = () {
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
+    };
+  }
 
+  VoidCallback listener;
   @override
   void initState() {
     super.initState();
-    controller.addListener(() {});
+    controller.addListener(listener);
   }
 
   @override
   void deactivate() {
-    controller.removeListener(() {});
+    controller.removeListener(listener);
     super.deactivate();
   }
 
@@ -311,7 +422,7 @@ class _DIYVideoProgressIndicatorState extends State<DIYVideoProgressIndicator> {
             Positioned(
                 left: 1.0,
                 top: 25,
-                width: widget.videoWidth,
+                right: 0.0,
                 child: Container(
                   margin: EdgeInsets.symmetric(horizontal: 15.0),
                   child: SizedBox(
@@ -325,7 +436,7 @@ class _DIYVideoProgressIndicatorState extends State<DIYVideoProgressIndicator> {
                   ),
                 )),
             Positioned(
-              width: widget.videoWidth,
+              right: 0.0,
               left: 0.0,
               top: 10.0,
               child: Container(

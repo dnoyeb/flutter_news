@@ -41,9 +41,10 @@ class _HomePageState extends State<HomePage>
     // Navigator.of(context).pop();
     super.initState();
   }
+ 
 
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => false;
 
   Future loadData() async {
     await dio
@@ -180,7 +181,7 @@ class _HomePageState extends State<HomePage>
                     ],
                   ),
                 );
-              } else{
+              } else {
                 return HomeItemWidget(index: index, dataList: dataList);
               }
             },

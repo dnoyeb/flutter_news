@@ -50,7 +50,11 @@ class MyDrawer extends StatelessWidget {
                     title: const Text('退出登录'),
                     onTap: () {
                       logout();
-                      Navigator.pushReplacementNamed(context, '/login');
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/login',
+                        (route) => route == null,
+                      );
                     },
                   ),
                 ],
