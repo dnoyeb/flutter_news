@@ -85,9 +85,9 @@ class HomeItemWidget extends StatelessWidget {
                 children: <Widget>[
                   Expanded(
                     flex: 1,
-                    child: Image.network(
+                    child: Image.asset(
                       dataList[index],
-                      fit: BoxFit.fill,
+                      fit: BoxFit.fitHeight,
                       height: 100.0,
                     ),
                   ),
@@ -96,9 +96,9 @@ class HomeItemWidget extends StatelessWidget {
                   ),
                   Expanded(
                     flex: 1,
-                    child: Image.network(
+                    child: Image.asset(
                       dataList[index],
-                      fit: BoxFit.fill,
+                      fit: BoxFit.fitHeight,
                       height: 100.0,
                     ),
                   ),
@@ -107,9 +107,9 @@ class HomeItemWidget extends StatelessWidget {
                   ),
                   Expanded(
                     flex: 1,
-                    child: Image.network(
+                    child: Image.asset(
                       dataList[index],
-                      fit: BoxFit.fill,
+                      fit: BoxFit.fitHeight,
                       height: 100.0,
                     ),
                   ),
@@ -187,9 +187,9 @@ class HomeItemWidget extends StatelessWidget {
               tag: index,
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 15.0),
-                child: Image.network(
+                child: Image.asset(
                   dataList[index],
-                  fit: BoxFit.fill,
+                  fit: BoxFit.fitHeight,
                   height: 100.0,
                 ),
               ),

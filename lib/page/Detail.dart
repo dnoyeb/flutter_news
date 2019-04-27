@@ -61,7 +61,7 @@ class _DetailPageState extends State<DetailPage> {
                   Container(
                     child: Hero(
                       tag: widget.imgUrl,
-                      child: Image.network(
+                      child: Image.asset(
                         widget.imgUrl,
                         fit: BoxFit.fill,
                         height: 220.0,

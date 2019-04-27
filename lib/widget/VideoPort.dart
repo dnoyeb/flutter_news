@@ -32,7 +32,8 @@ class VideoPortWidget extends StatefulWidget {
   _VideoPortWidgetState createState() => _VideoPortWidgetState();
 }
 
-class _VideoPortWidgetState extends State<VideoPortWidget> {
+class _VideoPortWidgetState extends State<VideoPortWidget>
+    with SingleTickerProviderStateMixin {
   bool playEnd = false;
   VideoPlayerController get controller => widget.controller;
   @override
@@ -57,9 +58,13 @@ class _VideoPortWidgetState extends State<VideoPortWidget> {
   }
 
   double setValue = 0.0;
+  double opacity = 0.0;
   bool isDragLeft = true;
   bool isDraging = false;
   bool showMaskTap = false;
+
+  Timer timeOut;
+
   @override
   Widget build(BuildContext context) {
     Future<dynamic> _pushFullScreenWidget(BuildContext context) async {
@@ -153,11 +158,11 @@ class _VideoPortWidgetState extends State<VideoPortWidget> {
                       bottom: 0.0,
                       child: GestureDetector(
                         child: Container(
-                          color: isDraging||showMaskTap
+                          color: isDraging
                               ? Color.fromRGBO(0, 0, 0, 0.5)
                               : Color.fromRGBO(0, 0, 0, 0),
                           child: Center(
-                            child: isDraging&&!showMaskTap
+                            child: isDraging && !showMaskTap
                                 ? Container(
                                     width: 100.0,
                                     height: 100.0,
@@ -262,93 +267,150 @@ class _VideoPortWidgetState extends State<VideoPortWidget> {
                           });
                         },
                         onTap: () {
+                          if (timeOut != null) {
+                            timeOut.cancel();
+                          }
                           setState(() {
                             showMaskTap = !showMaskTap;
+                            opacity = showMaskTap ? 1 : 0;
                           });
+                          if (showMaskTap) {
+                            timeOut = new Timer(Duration(seconds: 2), () {
+                              setState(() {
+                                showMaskTap = false;
+                                opacity = 0;
+                              });
+                            });
+                          }
                         },
                       ),
                     ),
                   ],
                 ),
-                showMaskTap?Container(
-                  color: Color.fromARGB(80, 0, 0, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      GestureDetector(
-                        child: Container(
-                          width: 40.0,
-                          child: playEnd
-                              ? Icon(
-                                  Icons.play_arrow,
-                                  color: Colors.white,
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: AnimatedOpacity(
+                    opacity: opacity,
+                    duration: Duration(milliseconds: 300),
+                    child: showMaskTap && widget.isFullScreen
+                        ? Container(
+                            alignment: Alignment.topLeft,
+                            height: 40.0,
+                            color: Color.fromARGB(80, 0, 0, 0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                FlatButton(
+                                  child: Icon(
+                                    Icons.arrow_back,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                Text(
+                                  '视频标题',
+                                  style: TextStyle(
+                                    inherit: false,
+                                    color: Colors.white,
+                                    fontSize: 16.0,
+                                  ),
                                 )
-                              : controller.value.isPlaying
-                                  ? Icon(
-                                      Icons.pause,
-                                      color: Colors.white,
-                                    )
-                                  : Icon(
-                                      Icons.play_arrow,
-                                      color: Colors.white,
-                                    ),
-                        ),
-                        onTap: () {
-                          setState(() {
-                            playEnd
-                                ? controller
-                                    .seekTo(controller.value.duration * 0)
-                                : controller.value.isPlaying
-                                    ? controller.pause()
-                                    : controller.play();
-                            playEnd = false;
-                          });
-                        },
-                      ),
-                      Container(
-                        width: 80.0,
-                        child: Text(
-                          '${controller.value.position.toString().substring(2, 7)}/${controller.value.duration.toString().substring(2, 7)}',
-                          style: TextStyle(color: Colors.white, fontSize: 12.0),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Expanded(
-                        child: Container(
-                          height: 50.0,
-                          child: DIYVideoProgressIndicator(
-                            controller,
-                            allowScrubbing: true,
-                            padding: const EdgeInsets.only(top: 0.0),
-                            colors: VideoProgressColors(
-                              playedColor: Colors.blue,
-                              bufferedColor: Colors.grey[400],
-                              backgroundColor: Colors.grey[800],
+                              ],
                             ),
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        child: Container(
-                          width: 40.0,
-                          child: Icon(
-                            widget.isFullScreen
-                                ? Icons.fullscreen_exit
-                                : Icons.fullscreen,
-                            color: Colors.white,
-                          ),
-                        ),
-                        onTap: () {
-                          widget.isFullScreen
-                              ? Navigator.of(context).pop()
-                              : _pushFullScreenWidget(context);
-                        },
-                      ),
-                    ],
+                          )
+                        : Container(),
                   ),
-                ):Container(),
+                ),
+                AnimatedOpacity(
+                  opacity: opacity,
+                  duration: Duration(milliseconds: 300),
+                  child: showMaskTap
+                      ? Container(
+                          color: Color.fromARGB(80, 0, 0, 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: <Widget>[
+                              GestureDetector(
+                                child: Container(
+                                  width: 40.0,
+                                  child: playEnd
+                                      ? Icon(
+                                          Icons.play_arrow,
+                                          color: Colors.white,
+                                        )
+                                      : controller.value.isPlaying
+                                          ? Icon(
+                                              Icons.pause,
+                                              color: Colors.white,
+                                            )
+                                          : Icon(
+                                              Icons.play_arrow,
+                                              color: Colors.white,
+                                            ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    playEnd
+                                        ? controller.seekTo(
+                                            controller.value.duration * 0)
+                                        : controller.value.isPlaying
+                                            ? controller.pause()
+                                            : controller.play();
+                                    playEnd = false;
+                                  });
+                                },
+                              ),
+                              Container(
+                                width: 80.0,
+                                child: Text(
+                                  '${controller.value.position.toString().substring(2, 7)}/${controller.value.duration.toString().substring(2, 7)}',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12.0),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Expanded(
+                                child: Container(
+                                  height: 50.0,
+                                  child: DIYVideoProgressIndicator(
+                                    controller,
+                                    allowScrubbing: true,
+                                    padding: const EdgeInsets.only(top: 0.0),
+                                    colors: VideoProgressColors(
+                                      playedColor: Colors.blue,
+                                      bufferedColor: Colors.grey[400],
+                                      backgroundColor: Colors.grey[800],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                child: Container(
+                                  width: 40.0,
+                                  child: Icon(
+                                    widget.isFullScreen
+                                        ? Icons.fullscreen_exit
+                                        : Icons.fullscreen,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                onTap: () {
+                                  widget.isFullScreen
+                                      ? Navigator.of(context).pop()
+                                      : _pushFullScreenWidget(context);
+                                },
+                              ),
+                            ],
+                          ),
+                        )
+                      : Container(),
+                ),
               ],
             ),
           )

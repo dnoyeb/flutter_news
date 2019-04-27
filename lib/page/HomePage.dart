@@ -20,12 +20,26 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin {
-  List dataList = [];
+  List dataList = [
+    'assets/images/Avengers1.png',
+    'assets/images/Avengers2.png',
+    'assets/images/Avengers3.png',
+    'assets/images/Avengers4.png',
+    'assets/images/Avengers5.png',
+    'assets/images/Avengers6.png',
+    'assets/images/Avengers7.png',
+    'assets/images/Avengers8.png',
+    'assets/images/Avengers9.png',
+    'assets/images/Avengers10.png',
+    'assets/images/Avengers11.png',
+    'assets/images/Avengers12.png',
+    'assets/images/Avengers13.png',
+  ];
   var imgUrlList = [
-    'http://pic162.nipic.com/file/20180420/26806460_165258143000_2.jpg',
-    'http://img1.juimg.com/141011/330800-1410111R61550.jpg',
-    'http://pic150.nipic.com/file/20171219/26316369_132213731000_2.jpg',
-    'http://img5.imgtn.bdimg.com/it/u=3255342426,1145076963&fm=200&gp=0.jpg'
+    'assets/images/Avengers1.png',
+    'assets/images/Avengers2.png',
+    'assets/images/Avengers3.png',
+    'assets/images/Avengers4.png',
   ];
 
   GlobalKey<RefreshHeaderState> _headerKey =
@@ -37,34 +51,32 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     // CommonUtils.showLoadingDialog(context, '正在加载');
-    loadData();
-    // Navigator.of(context).pop();
+    // loadData();
     super.initState();
   }
- 
 
   @override
-  bool get wantKeepAlive => false;
+  bool get wantKeepAlive => true;
 
-  Future loadData() async {
-    await dio
-        .get(
-            'https://result.eolinker.com/VI1Wbcdb5a5f53e8621a1e4c252df9124da6a9030246781?uri=imgUrlList')
-        .then(
-      (res) {
-        setState(
-          () {
-            dataList = json.decode(res.data)['list'];
-          },
-        );
-      },
-    );
-  }
+  // Future loadData() async {
+  //   await dio
+  //       .get(
+  //           'https://result.eolinker.com/VI1Wbcdb5a5f53e8621a1e4c252df9124da6a9030246781?uri=imgUrlList')
+  //       .then(
+  //     (res) {
+  //       setState(
+  //         () {
+  //           dataList = json.decode(res.data)['list'];
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
   Future _refresh() async {
     // await loadData();
     await new Future.delayed(const Duration(seconds: 2), () {
-      loadData();
+      // loadData();
     });
   }
 
@@ -129,9 +141,8 @@ class _HomePageState extends State<HomePage>
                         width: double.infinity,
                         child: Stack(
                           children: <Widget>[
-                            Image.network(
-                              model.imageUrl ??
-                                  'http://pic162.nipic.com/file/20180420/26806460_165258143000_2.jpg',
+                            Image.asset(
+                              model.imageUrl ?? 'assets/images/Avengers1.png',
                               fit: BoxFit.fill,
                               width: double.infinity,
                               height: double.infinity,
@@ -154,9 +165,9 @@ class _HomePageState extends State<HomePage>
                           itemBuilder: (BuildContext context, int index) {
                             return ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child: Image.network(
+                              child: Image.asset(
                                 imgUrlList[index],
-                                fit: BoxFit.fill,
+                                fit: BoxFit.fitHeight,
                               ),
                             );
                           },
