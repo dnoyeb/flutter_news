@@ -63,7 +63,7 @@ class _DetailPageState extends State<DetailPage> {
                       tag: widget.imgUrl,
                       child: Image.asset(
                         widget.imgUrl,
-                        fit: BoxFit.fill,
+                        fit: BoxFit.fitWidth,
                         height: 220.0,
                         width: double.infinity,
                       ),
@@ -84,7 +84,7 @@ class _DetailPageState extends State<DetailPage> {
                 ],
               ),
               onTap: () {
-                showPhoto(context, widget.imgUrl, 'net', widget.imgUrl);
+                showPhoto(context, widget.imgUrl, 'assets', widget.imgUrl);
               },
             ),
           ),

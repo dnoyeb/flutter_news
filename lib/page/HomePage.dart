@@ -167,7 +167,7 @@ class _HomePageState extends State<HomePage>
                               borderRadius: BorderRadius.circular(10),
                               child: Image.asset(
                                 imgUrlList[index],
-                                fit: BoxFit.fitHeight,
+                                fit: BoxFit.fitWidth,
                               ),
                             );
                           },
