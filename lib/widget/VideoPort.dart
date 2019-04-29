@@ -60,6 +60,7 @@ class _VideoPortWidgetState extends State<VideoPortWidget>
   double setValue = 0.0;
   double opacity = 0.0;
   bool isDragLeft = true;
+  bool isDraghorizon = false;
   bool isDraging = false;
   bool showMaskTap = false;
 
@@ -151,6 +152,15 @@ class _VideoPortWidgetState extends State<VideoPortWidget>
                 Stack(
                   children: <Widget>[
                     VideoPlayer(controller),
+                    VideoProgressIndicator(
+                      controller,
+                      allowScrubbing: true,
+                      colors: VideoProgressColors(
+                        playedColor: Colors.blue,
+                        bufferedColor: Colors.green,
+                        backgroundColor: Colors.grey[800],
+                      ),
+                    ),
                     Positioned(
                       top: 0.0,
                       left: 0.0,
@@ -158,11 +168,11 @@ class _VideoPortWidgetState extends State<VideoPortWidget>
                       bottom: 0.0,
                       child: GestureDetector(
                         child: Container(
-                          color: isDraging
+                          color: isDraging || isDraghorizon
                               ? Color.fromRGBO(0, 0, 0, 0.5)
                               : Color.fromRGBO(0, 0, 0, 0),
                           child: Center(
-                            child: isDraging && !showMaskTap
+                            child: (isDraghorizon || isDraging) && !showMaskTap
                                 ? Container(
                                     width: 100.0,
                                     height: 100.0,
@@ -178,13 +188,24 @@ class _VideoPortWidgetState extends State<VideoPortWidget>
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: <Widget>[
-                                        Icon(
-                                          isDragLeft
-                                              ? Icons.brightness_6
-                                              : Icons.volume_up,
-                                          size: 40.0,
-                                          color: Colors.white,
-                                        ),
+                                        isDraghorizon
+                                            ? Text(
+                                                '${controller.value.position.toString().substring(2, 7)}',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  inherit: false,
+                                                  color: Colors.white,
+                                                  fontSize: 18.0,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              )
+                                            : Icon(
+                                                isDragLeft
+                                                    ? Icons.wb_sunny
+                                                    : Icons.volume_up,
+                                                size: 40.0,
+                                                color: Colors.white,
+                                              ),
                                         SizedBox(
                                           height: 10.0,
                                         ),
@@ -202,7 +223,26 @@ class _VideoPortWidgetState extends State<VideoPortWidget>
                           ),
                         ),
                         onHorizontalDragUpdate: (DragUpdateDetails details) {
-                          print(details);
+                          int position =
+                              controller.value.position.inMilliseconds;
+                          int duration =
+                              controller.value.duration.inMilliseconds;
+                          if (details.delta.dx > 0) {
+                            position += 5000;
+                          } else {
+                            position -= 5000;
+                          }
+                          position = position > duration
+                              ? duration
+                              : position < 0 ? 0 : position;
+                          setState(() {
+                            setValue = position / duration;
+                            isDraghorizon = true;
+                          });
+                          final Duration toposition =
+                              controller.value.duration * setValue;
+
+                          controller.seekTo(toposition);
                         },
                         onVerticalDragStart: (DragStartDetails details) {
                           isDragLeft =
@@ -248,22 +288,22 @@ class _VideoPortWidgetState extends State<VideoPortWidget>
                         },
                         onVerticalDragEnd: (DragEndDetails) {
                           setState(() {
-                            isDraging = false;
+                            isDraging = isDraghorizon = false;
                           });
                         },
                         onVerticalDragCancel: () {
                           setState(() {
-                            isDraging = false;
+                            isDraging = isDraghorizon = false;
                           });
                         },
                         onHorizontalDragEnd: (DragEndDetails) {
                           setState(() {
-                            isDraging = false;
+                            isDraging = isDraghorizon = false;
                           });
                         },
                         onHorizontalDragCancel: () {
                           setState(() {
-                            isDraging = false;
+                            isDraging = isDraghorizon = false;
                           });
                         },
                         onTap: () {
