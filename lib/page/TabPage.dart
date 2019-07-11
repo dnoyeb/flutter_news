@@ -69,28 +69,29 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
       //   ),
       // ),
       bottomNavigationBar: BottomNavigationBar(
-        fixedColor: Theme.of(context).primaryColor,
+        fixedColor:Theme.of(context).primaryColor,
+        backgroundColor:Colors.white,
         // 底部导航
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             title: Text('Home'),
-            backgroundColor: Theme.of(context).primaryColor,
+            backgroundColor: Colors.grey[300],
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.remove_red_eye),
             title: Text('Beauty'),
-            backgroundColor: Theme.of(context).primaryColor,
+            backgroundColor: Colors.grey[300],
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.info),
             title: Text('Info'),
-            backgroundColor: Theme.of(context).primaryColor,
+            backgroundColor: Colors.grey[300],
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),
             title: Text('My'),
-            backgroundColor: Theme.of(context).primaryColor,
+            backgroundColor: Colors.grey[300],
           ),
         ],
         currentIndex: _selectedIndex,
