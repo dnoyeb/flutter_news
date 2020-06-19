@@ -13,6 +13,7 @@ class _WelcomePageState extends State<WelcomePage> {
   List<Slide> slides = new List();
 
   void initUser() async {
+    await LocalStorage.remove('hasLogin');
     var hasLogin = await LocalStorage.get('hasLogin');
     hasLogin == null
         ? Navigator.pushNamedAndRemoveUntil(

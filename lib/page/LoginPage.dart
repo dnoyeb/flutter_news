@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import "../common//local//LocalStorage.dart";
@@ -16,51 +16,70 @@ class _LoginPageState extends State<LoginPage> {
   String _password = "";
   bool _userNameValid = true;
   bool _passwordValid = true;
-  final TextEditingController userController = new TextEditingController();
-  final TextEditingController pwController = new TextEditingController();
-  FocusNode _focusUserName = new FocusNode();
-  FocusNode _focusPassword = new FocusNode();
+  final TextEditingController userController = TextEditingController();
+  final TextEditingController pwController = TextEditingController();
+  FocusNode _focusUserName = FocusNode();
+  FocusNode _focusPassword = FocusNode();
+  VideoPlayerController _controller;
 
   @override
   void initState() {
     initParams();
     _focusUserName.addListener(() {
       if (!_focusUserName.hasFocus) {
-        setState(() {
-          _userNameValid = RegexUtil.isMobileExact(_userName);
-        });
+        if (_userName == null || _userName == '' || _userName.isEmpty) {
+          _userNameValid = false;
+        } else {
+          setState(() {
+            _userNameValid = !RegexUtil.isMobileExact(_userName);
+          });
+        }
       }
     });
     _focusPassword.addListener(() {
       if (!_focusPassword.hasFocus) {
-        if (_password == null || _password.isEmpty) {
+        if (_password == null || _password == '' || _password.isEmpty) {
           _passwordValid = false;
         } else {
           setState(() {
-            _passwordValid = new RegExp('^(\\w){6,20}\$').hasMatch(_password);
+            _passwordValid = !RegExp('^(\\w){6,20}\$').hasMatch(_password);
           });
         }
       }
     });
     super.initState();
+    _controller = VideoPlayerController.asset('assets/videos/avengers.mp4');
+
+    _controller.addListener(() {
+      setState(() {});
+    });
+    _controller.setLooping(true);
+    _controller.initialize().then((_) => setState(() {}));
+    _controller.play();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   void _userNameChanged(String str) {
-    _userName = str;
-    if (RegexUtil.isMobileExact(str)) {
+    if (str == null || str == '' || str.isEmpty) {
+      _userNameValid = false;
+    } else {
       setState(() {
-        _userNameValid = true;
+        _userNameValid = !RegexUtil.isMobileExact(str);
       });
     }
   }
 
   void _passwordChanged(String str) {
-    _password = str;
-    if (_password == null || _password.isEmpty) {
+    if (str == null || str == '' || str.isEmpty) {
       _passwordValid = false;
-    } else if (new RegExp('^(\\w){6,20}\$').hasMatch(str)) {
+    } else {
       setState(() {
-        _passwordValid = true;
+        _passwordValid = !RegExp('^(\\w){6,20}\$').hasMatch(str);
       });
     }
   }
@@ -68,8 +87,8 @@ class _LoginPageState extends State<LoginPage> {
   initParams() async {
     _userName = await LocalStorage.get('userName');
     _password = await LocalStorage.get('password');
-    userController.value = new TextEditingValue(text: _userName ?? "");
-    pwController.value = new TextEditingValue(text: _password ?? "");
+    userController.value = TextEditingValue(text: _userName ?? "");
+    pwController.value = TextEditingValue(text: _password ?? "");
   }
 
   saveUser() async {
@@ -77,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
       await LocalStorage.save('userName', userController.value.toString());
       await LocalStorage.save('password', pwController.value.toString());
       await LocalStorage.save('hasLogin', 'yes');
-      new Timer(Duration(seconds: 2), () {
+      Timer(Duration(seconds: 2), () {
         Navigator.pushNamedAndRemoveUntil(
           context,
           '/tab',
@@ -90,110 +109,155 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: new Container(
-        decoration: new BoxDecoration(
-          image: new DecorationImage(
-            image: new AssetImage("assets/images/welcome.jpg"),
-            fit: BoxFit.fill,
-            colorFilter: ColorFilter.mode(
-                Colors.grey[400].withOpacity(0.3), BlendMode.hardLight),
-          ),
-        ),
-        width: double.infinity,
-        height: double.infinity,
-        padding: const EdgeInsets.all(30.0),
-        child: new Center(
-          child: new Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              new TextField(
-                controller: userController,
-                keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.all(10.0),
-                  icon: Icon(Icons.account_circle),
-                  labelText: '请输入账号',
-                  helperText: _userNameValid ? '' : '请输入有效账号',
+        body: ConstrainedBox(
+            constraints: BoxConstraints.expand(),
+            child: Stack(
+              alignment: Alignment.center,
+              children: <Widget>[
+                Container(
+                  constraints: BoxConstraints.expand(),
+                  child: VideoPlayer(_controller),
                 ),
-                focusNode: _focusUserName,
-                maxLengthEnforced: false,
-                inputFormatters: [LengthLimitingTextInputFormatter(11)],
-                cursorColor: Colors.red,
-                onChanged: _userNameChanged,
-                autofocus: false,
-              ),
-              new TextField(
-                controller: pwController,
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.all(10.0),
-                  icon: Icon(Icons.keyboard),
-                  labelText: '请输入密码',
-                  helperText: _passwordValid ? '' : '请输入有效密码',
-                ),
-                focusNode: _focusPassword,
-                inputFormatters: [LengthLimitingTextInputFormatter(21)],
-                obscureText: true,
-                cursorColor: Colors.red,
-                onChanged: _passwordChanged,
-                autofocus: false,
-              ),
-              new Container(
-                margin: EdgeInsets.only(top: 40),
-                child: new Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    new RaisedButton(
-                      // 文本内容
-                      child: new Flex(
+                Opacity(
+                    opacity: 0.6,
+                    child: Container(
+                      constraints: BoxConstraints.expand(),
+                      color: Colors.black,
+                    )),
+                Positioned(
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(30.0),
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        direction: Axis.horizontal,
+                        mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          new Text(
-                            '登陆',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: new TextStyle(
+                          TextField(
+                            style: TextStyle(
                               color: Colors.white,
+                            ),
+                            controller: userController,
+                            keyboardType: TextInputType.phone,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(10.0),
+                              labelStyle: TextStyle(
+                                color: Colors.blue,
+                              ),
+                              icon: Icon(
+                                Icons.account_circle,
+                                color: Colors.blue,
+                              ),
+                              hintStyle: TextStyle(
+                                color: Colors.white,
+                              ),
+                              labelText: '请输入账号',
+                              helperText: _userNameValid ? '' : '请输入有效账号',
+                              helperStyle: TextStyle(
+                                color: Colors.yellow,
+                              ),
+                              fillColor: Colors.white,
+                            ),
+                            focusNode: _focusUserName,
+                            maxLengthEnforced: false,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(11)
+                            ],
+                            cursorColor: Colors.red,
+                            onChanged: _userNameChanged,
+                            autofocus: false,
+                          ),
+                          TextField(
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                            controller: pwController,
+                            keyboardType: TextInputType.text,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(10.0),
+                              labelStyle: TextStyle(
+                                color: Colors.blue,
+                              ),
+                              icon: Icon(
+                                Icons.keyboard,
+                                color: Colors.blue,
+                              ),
+                              hintStyle: TextStyle(
+                                color: Colors.white,
+                              ),
+                              labelText: '请输入密码',
+                              helperText: _passwordValid ? '' : '请输入有效密码',
+                              helperStyle: TextStyle(
+                                color: Colors.yellow,
+                              ),
+                            ),
+                            focusNode: _focusPassword,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(21)
+                            ],
+                            obscureText: true,
+                            cursorColor: Colors.red,
+                            onChanged: _passwordChanged,
+                            autofocus: false,
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(top: 40),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: <Widget>[
+                                RaisedButton(
+                                  // 文本内容
+                                  child: Flex(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    direction: Axis.horizontal,
+                                    children: <Widget>[
+                                      Text(
+                                        '登陆',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  onPressed: () {
+                                    CommonUtils.showLoadingDialog(
+                                        context, '正在登陆');
+                                    saveUser();
+                                  },
+                                  color: Colors.blue,
+                                ),
+                                RaisedButton(
+                                  // 文本内容
+                                  child: Flex(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    direction: Axis.horizontal,
+                                    children: <Widget>[
+                                      Text(
+                                        '注册',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  onPressed: () {
+                                    CommonUtils.showAlertDialog(
+                                        context, '~~', '暂未开发');
+                                  },
+                                  color: Colors.blue,
+                                ),
+                              ],
                             ),
                           )
                         ],
                       ),
-                      onPressed: () {
-                        CommonUtils.showLoadingDialog(context, '正在登陆');
-                        saveUser();
-                      },
-                      color: Colors.blue,
                     ),
-                    new RaisedButton(
-                      // 文本内容
-                      child: new Flex(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        direction: Axis.horizontal,
-                        children: <Widget>[
-                          new Text(
-                            '注册',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: new TextStyle(
-                              color: Colors.white,
-                            ),
-                          )
-                        ],
-                      ),
-                      onPressed: () {
-                        CommonUtils.showAlertDialog(context, '~~', '暂未开发');
-                      },
-                      color: Colors.blue,
-                    ),
-                  ],
+                  ),
                 ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
+              ],
+            )));
   }
 }

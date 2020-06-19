@@ -108,7 +108,7 @@ class _HomePageState extends State<HomePage>
           child: new ListView.builder(
             //ListView的Item
             itemCount: dataList.length,
-            itemBuilder: (BuildContext context, int index) {
+            itemBuilder: (BuildContext context, int index) { 
               if (index == 0) {
                 return Container(
                   height: 240.0,
