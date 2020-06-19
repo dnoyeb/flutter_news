@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:syk_flutter/widget/PourWater.dart';
+import 'package:flutter_news/widget/PourWater.dart';
 import '../widget//WaterCup.dart';
 
 class MyPage extends StatefulWidget {

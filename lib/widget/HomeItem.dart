@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:syk_flutter/page/Detail.dart';
-import 'package:syk_flutter/common/utils/CommonUtils.dart';
+import 'package:flutter_news/page/Detail.dart';
+import 'package:flutter_news/common/utils/CommonUtils.dart';
 
 class HomeItemWidget extends StatelessWidget {
   final int index;

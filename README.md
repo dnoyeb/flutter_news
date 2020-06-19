@@ -1,4 +1,4 @@
-# syk_flutter
+# flutter_news
     自己学习写的flutter项目案例，慢慢摸索中...
     覆盖技能点：
       1、欢迎屏幕slide

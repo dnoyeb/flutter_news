@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:syk_flutter/common/net/http.dart';
-import 'package:syk_flutter/widget/HomeItem.dart';
+import 'package:flutter_news/common/net/http.dart';
+import 'package:flutter_news/widget/HomeItem.dart';
 import '../common/model/MainModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
@@ -20,6 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin {
+  EasyRefreshController _controller;
   List dataList = [
     'assets/images/Avengers1.png',
     'assets/images/Avengers2.png',
@@ -42,16 +43,11 @@ class _HomePageState extends State<HomePage>
     'assets/images/Avengers4.png',
   ];
 
-  GlobalKey<RefreshHeaderState> _headerKey =
-      new GlobalKey<RefreshHeaderState>();
-  GlobalKey<RefreshFooterState> _footerKey =
-      new GlobalKey<RefreshFooterState>();
-  GlobalKey<EasyRefreshState> _easyRefreshKey =
-      new GlobalKey<EasyRefreshState>();
   @override
   void initState() {
     // CommonUtils.showLoadingDialog(context, '正在加载');
     // loadData();
+    _controller = EasyRefreshController();
     super.initState();
   }
 
@@ -80,7 +76,7 @@ class _HomePageState extends State<HomePage>
     });
   }
 
-  Future _loadMore() async {
+  Future _onLoad() async {
     await new Future.delayed(const Duration(seconds: 2), () {
       List list = [];
       int count = 5;
@@ -100,32 +96,14 @@ class _HomePageState extends State<HomePage>
     return ScopedModelDescendant<MainModel>(
       builder: (context, child, model) {
         return EasyRefresh(
-          key: _easyRefreshKey,
-          behavior: ScrollOverBehavior(),
-          refreshHeader: ClassicsHeader(
-            key: _headerKey,
-            refreshText: '下拉刷新',
-            refreshReadyText: '松开刷新',
-            refreshingText: '正在刷新...',
-            refreshedText: '刷新完成',
-            moreInfo: '更新时间 %T',
+          controller: _controller,
+          header: ClassicalHeader(
             bgColor: Colors.transparent,
             textColor: Colors.black87,
-            moreInfoColor: Colors.black54,
-            showMore: true,
           ),
-          refreshFooter: ClassicsFooter(
-            key: _footerKey,
-            loadText: '上拉加载',
-            loadReadyText: '松开加载',
-            loadingText: '正在加载...',
-            noMoreText: '没有更多数据...',
-            loadedText: '加载完成',
-            moreInfo: '加载时间 %T',
+          footer: ClassicalFooter(
             bgColor: Colors.transparent,
             textColor: Colors.black87,
-            moreInfoColor: Colors.black54,
-            showMore: true,
           ),
           child: new ListView.builder(
             //ListView的Item
@@ -198,7 +176,7 @@ class _HomePageState extends State<HomePage>
             },
           ),
           onRefresh: _refresh,
-          loadMore: _loadMore,
+          onLoad: _onLoad,
         );
       },
     );

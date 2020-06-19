@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:syk_flutter/widget/Triangle.dart';
+import 'package:flutter_news/widget/Triangle.dart';
 
 class CommonUtils {
   static showLoadingDialog(BuildContext context, String msg) {

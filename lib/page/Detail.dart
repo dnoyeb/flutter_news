@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:syk_flutter/widget/PhotoScale.dart';
+import 'package:flutter_news/widget/PhotoScale.dart';
 import '../widget/SliverAppBarDelegate.dart';
 
 class DetailPage extends StatefulWidget {
